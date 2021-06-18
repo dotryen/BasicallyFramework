@@ -1,0 +1,17 @@
+{
+    "name": "Basically.Editor",
+    "references": [
+        "GUID:a8b910cf44979394f8c954c0e6b66825"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
