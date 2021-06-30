@@ -1,35 +1,37 @@
-﻿using System.Collections;
+﻿#if PHYS_3D
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Basically.Utility;
 
 namespace Basically.Entities {
+    using Utility;
+
     [RequireComponent(typeof(Rigidbody))]
     public class PhysicsEntity : Entity {
-        public Rigidbody rb;
+        public new Rigidbody rigidbody;
 
-        internal override Vector3 tPosition => rb.position;
-        internal override Quaternion tRotation => rb.rotation;
+        internal override Vector3 tPosition => rigidbody.position;
+        internal override Quaternion tRotation => rigidbody.rotation;
 
         public Vector3 Velocity { get; private set; }
-        public bool debug = false;
 
         protected internal override void OnServerStart() {
-            rb = GetComponent<Rigidbody>();
+            rigidbody = GetComponent<Rigidbody>();
         }
 
         protected internal override void OnClientStart() {
-            rb = GetComponent<Rigidbody>();
-            rb.isKinematic = true;
+            rigidbody = GetComponent<Rigidbody>();
+            rigidbody.isKinematic = true;
         }
 
         protected internal override void OnServerTick() {
-            Debug.DrawRay(rb.position, rb.velocity);
+            // Debug.DrawRay(rigidbody.position, rigidbody.velocity);
         }
 
         protected internal override Parameters WriteData() {
             Parameters param = new Parameters();
-            param.Add("vel", rb.velocity);
+            param.Add("vel", rigidbody.velocity);
             return param;
         }
 
@@ -39,15 +41,15 @@ namespace Basically.Entities {
         }
 
         protected internal override void Interpolate(EntityState from, EntityState to, float interpAmount) {
-            Vector3 fromVel = (Vector3)from.parameters["vel"];
-            Vector3 toVel = (Vector3)to.parameters["vel"];
+            Vector3 fromVel = Vector3.ClampMagnitude((Vector3)from.parameters["vel"], 1);
+            Vector3 toVel = Vector3.ClampMagnitude((Vector3)to.parameters["vel"], 1);
 
-            transform.position = HermiteCurve.Sample(from.position, fromVel, to.position, toVel, interpAmount);
+            // position = HermiteCurve.Sample(from.position, fromVel, to.position, toVel, interpAmount);
+            transform.position = Vector3.Lerp(from.position, to.position, interpAmount);
             transform.rotation = Quaternion.Slerp(from.rotation, to.rotation, interpAmount);
-
-            if (debug) Debug.Log($"From Velocity: {fromVel}, To Velocity: {toVel}, Difference: {toVel - fromVel}");
-            HermiteCurve.DrawCurve(from.position, fromVel, to.position, toVel, Color.yellow);
+            HermiteCurve.DrawCurve(from.position, fromVel, to.position, toVel);
         }
     }
 }
 
+#endif

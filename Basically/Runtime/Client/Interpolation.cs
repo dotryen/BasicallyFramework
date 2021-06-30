@@ -16,12 +16,19 @@ namespace Basically.Client {
         // extra two frames for jitter and shit
         const int BUFFER_SIZE = NetworkTiming.SNAPSHOTS_PER_SECOND + 2;
 
-        static WorldState[] buffer = new WorldState[BUFFER_SIZE];
-        static float currentTime = 0f;
-        static int bufferSpot = 0;
+        static WorldState[] buffer;
+        static float currentTime;
+        static int bufferSpot;
         static int lastTick;
+        static int interpTicks;
 
-        private static int InterpTimeInTicks => Mathf.FloorToInt(NetworkTiming.INTERP_TIME_TICK);
+        internal static void Initialize() {
+            buffer = new WorldState[BUFFER_SIZE];
+            // interpTicks = Mathf.FloorToInt(NetworkTiming.INTERP_TIME_TICK); // WIth interpolation
+            interpTicks = 0; // Cancel interpolation
+            currentTime = 0;
+            bufferSpot = 0;
+        }
 
         internal static void AddState(WorldSnapshot snap) {
             if (snap.tick <= lastTick) return;
@@ -40,7 +47,7 @@ namespace Basically.Client {
                 };
             }
 
-            buffer[BufferPos(bufferSpot + InterpTimeInTicks)] = state;
+            buffer[BufferPos(bufferSpot + interpTicks)] = state;
             lastTick = snap.tick;
             bufferSpot++;
         }
@@ -79,6 +86,7 @@ namespace Basically.Client {
                         ent.Interpolate(fromSnap.states[i], toSnap.states[i], amount);
                     }
                     // Debug.Log($"INTERP: From Tick: {fromSnap.tick}, To Tick: {toSnap.tick}, Amount: {amount}");
+                    Client.Instance.currentInterpTime = amount;
                 } else {
                     // snap lol
                     for (int i = 0; i < EntityManager.entities.Length; i++) {

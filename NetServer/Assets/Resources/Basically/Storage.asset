@@ -36,8 +36,6 @@ MonoBehaviour:
   messages:
   - Basically.Networking.WelcomeMessage, Basically, Version=0.0.0.0, Culture=neutral,
     PublicKeyToken=null
-  - Basically.Networking.WelcomeConfirmation, Basically, Version=0.0.0.0, Culture=neutral,
-    PublicKeyToken=null
   - Basically.Networking.WorldSnapshot, Basically, Version=0.0.0.0, Culture=neutral,
     PublicKeyToken=null
-  messageBits: 2
+  messageBits: 1

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Basically.Networking {
     using ENet;
 
-    public enum PacketType {
+    public enum MessageType {
         Reliable = PacketFlags.Reliable,
         UnreliableSequenced = PacketFlags.None,
         Unreliable = PacketFlags.Unsequenced,

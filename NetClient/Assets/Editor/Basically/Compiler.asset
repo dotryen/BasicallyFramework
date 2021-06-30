@@ -15,3 +15,5 @@ MonoBehaviour:
   setup: 1
   client: 1
   server: 0
+  entities: 1
+  mappacks: 1

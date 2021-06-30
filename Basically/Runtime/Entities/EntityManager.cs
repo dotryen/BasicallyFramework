@@ -18,6 +18,8 @@ namespace Basically.Entities {
             }
         }
 
+#if BASICALLY_SERVER
+
         public static void ServerStart() {
             foreach (var ent in entities) {
                 ent.OnServerStart();
@@ -30,6 +32,10 @@ namespace Basically.Entities {
             }
         }
 
+#endif
+
+#if BASICALLY_CLIENT
+
         public static void ClientStart() {
             foreach (var ent in entities) {
                 ent.OnClientStart();
@@ -41,6 +47,8 @@ namespace Basically.Entities {
                 ent.OnClientTick();
             }
         }
+
+#endif
     }
 
     public class EntityState {

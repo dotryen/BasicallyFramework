@@ -14,16 +14,17 @@ namespace Basically.Serialization {
         const ushort TEN_BIT_MAX = 0x3FF;
 
         public override void Write(Buffer buffer, Quaternion value) {
-            Debug.Log("Bit pos before writing: " + buffer.CurrentWritePosition);
+            // normalize because i think it fixes some issues
+            value.Normalize();
 
             // range of 0-3 (2 bits)
-            int largestIndex = 0;
+            byte largestIndex = 0;
             Vector3 withoutLargest = new Vector3(value.y, value.z, value.w);
 
-            { // prepare variables
+            { // find largest value
                 Vector4 abs = new Vector4(Mathf.Abs(value.x), Mathf.Abs(value.y), Mathf.Abs(value.z), Mathf.Abs(value.w));
-                float largest = value.x;
-                
+                float largest = abs.x;
+
                 if (abs.y > largest) {
                     largestIndex = 1;
                     largest = abs.y;
@@ -58,9 +59,7 @@ namespace Basically.Serialization {
         }
 
         public override Quaternion Read(Buffer buffer) {
-            Debug.Log("Bit pos before reading: " + buffer.CurrentReadPosition);
-
-            int largestIndex = buffer.ReadInt(2);
+            byte largestIndex = buffer.ReadByte(2);
             ushort aScaled = buffer.ReadUShort(9);
             ushort bScaled = buffer.ReadUShort(9);
             ushort cScaled = buffer.ReadUShort(9);
@@ -72,9 +71,9 @@ namespace Basically.Serialization {
 
             Quaternion value;
             switch (largestIndex) {
-                case 0: value = new Quaternion(d, a, b, c); break;
-                case 1: value = new Quaternion(a, d, b, c); break;
-                case 2: value = new Quaternion(a, b, d, c); break;
+                case 0:  value = new Quaternion(d, a, b, c); break;
+                case 1:  value = new Quaternion(a, d, b, c); break;
+                case 2:  value = new Quaternion(a, b, d, c); break;
                 default: value = new Quaternion(a, b, c, d); break;
             }
 
@@ -88,7 +87,7 @@ namespace Basically.Serialization {
             return (ushort)(minTarget + (ushort)(valueRelative / valueRange * targetRange));
         }
 
-        private static float ScaleUShortToFloat(ushort value, ushort minValue, ushort maxValue, float minTarget, float maxTarget) {
+        private float ScaleUShortToFloat(ushort value, ushort minValue, ushort maxValue, float minTarget, float maxTarget) {
             float targetRange = maxTarget - minTarget;
             ushort valueRange = (ushort)(maxValue - minValue);
             ushort valueRelative = (ushort)(value - minValue);

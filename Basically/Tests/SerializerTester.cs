@@ -52,5 +52,22 @@ namespace Tests
         //     Assert.AreEqual(message.type.one, newMessage.type.one);
         //     Assert.AreEqual(message.type.two, newMessage.type.two);
         // }
+
+        [Test]
+        public void QuaternionSerialize() {
+            SerializerStorage.Initialize();
+            var serial = SerializerStorage.GetSerializer<Quaternion>();
+
+            Buffer buffer = new Buffer();
+            Quaternion value = new Quaternion(1, 3, 4, 2).normalized;
+
+            serial.Write(buffer, value);
+            var decompressed = serial.Read(buffer);
+
+            Assert.That(decompressed.x, Is.EqualTo(value.x).Within(0.005f));
+            Assert.That(decompressed.y, Is.EqualTo(value.y).Within(0.005f));
+            Assert.That(decompressed.z, Is.EqualTo(value.z).Within(0.005f));
+            Assert.That(decompressed.w, Is.EqualTo(value.w).Within(0.005f));
+        }
     }
 }

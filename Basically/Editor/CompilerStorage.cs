@@ -6,4 +6,6 @@ internal class CompilerStorage : ScriptableObject {
     public bool setup = false;
     public bool client;
     public bool server;
+    public bool entities;
+    public bool mappacks;
 }

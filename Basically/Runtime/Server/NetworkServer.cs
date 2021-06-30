@@ -12,6 +12,7 @@ using Basically.Utility;
 namespace Basically.Server {
     public static class NetworkServer {
         private static NetworkHost host;
+        internal static HostCallbacks originalCallbacks;
 
         public static Connection[] Connections => host.Connections;
         public static byte ConnectedPlayers => (byte)Connections.Where(x => x.Connected).Count();
@@ -20,14 +21,15 @@ namespace Basically.Server {
         /// Initializes the Basically server.
         /// </summary>
         /// <param name="channels">Channel limit for networking.</param>
-        public static void Initialize(int channels) {
+        public static void Initialize(int channels, HostCallbacks callbacks) {
             if (host != null) return;
 
-            host = new NetworkHost(channels);
+            host = new NetworkHost(channels, new ServerCallbacks());
             SerializerStorage.Initialize();
-            AddReceiverClass(typeof(ServerReceivers));
+            ActionCache.Initialize();
 
-            host.OnConnect += OnConnect;
+            AddReceiverClass(typeof(ServerReceivers));
+            originalCallbacks = callbacks;
         }
 
         /// <summary>
@@ -60,7 +62,7 @@ namespace Basically.Server {
         /// </summary>
         public static void Update() {
             if (host == null) return;
-            host.Update();
+            ActionCache.Execute();
         }
 
         /// <summary>
@@ -72,7 +74,7 @@ namespace Basically.Server {
 
             foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Static)) {
                 if (!NetworkUtility.VerifyMethod(method)) continue;
-                host.AddReceiver(method.GetParameters()[1].ParameterType, NetworkUtility.GetDelegate(method));
+                host.AddReceiverInternal(method.GetParameters()[1].ParameterType, NetworkUtility.GetDelegate(method));
             }
         }
 
@@ -83,10 +85,12 @@ namespace Basically.Server {
         /// <param name="message">The message.</param>
         /// <param name="channel">Which channel to send the message through.</param>
         /// <param name="type">What type of message is this.</param>
-        public static void Broadcast<T>(T message, byte channel, PacketType type) where T : NetworkMessage {
+        public static void Broadcast<T>(T message, byte channel, MessageType type) where T : NetworkMessage {
             var payload = MessagePacker.SerializeMessage(message);
+            var flags = (Networking.ENet.PacketFlags)type;
+
             foreach (var conn in host.Connections) {
-                if (conn.Connected) conn.SendInternal(payload, channel, (Networking.ENet.PacketFlags)type);
+                if (conn.Connected) conn.SendInternal(payload, channel, flags);
             }
         }
 
@@ -98,12 +102,14 @@ namespace Basically.Server {
         /// <param name="channel">Which channel to send the message through.</param>
         /// <param name="type">What type of message is this.</param>
         /// <param name="excluding">Which player/connection to exclude.</param>
-        public static void Broadcast<T>(T message, byte channel, PacketType type, Connection excluding) where T : NetworkMessage {
+        public static void Broadcast<T>(T message, byte channel, MessageType type, Connection excluding) where T : NetworkMessage {
             var payload = MessagePacker.SerializeMessage(message);
+            var flags = (Networking.ENet.PacketFlags)type;
+
             foreach (var conn in host.Connections) {
                 if (conn.Connected) {
                     if (conn != excluding) {
-                        conn.SendInternal(payload, channel, (Networking.ENet.PacketFlags)type);
+                        conn.SendInternal(payload, channel, flags);
                     }
                 }
             }
@@ -117,15 +123,8 @@ namespace Basically.Server {
         /// <param name="channel">Which channel to send the message through.</param>
         /// <param name="type">What type of message is this.</param>
         /// <param name="excluding">ID of player to exclude.</param>
-        public static void Broadcast<T>(T message, byte channel, PacketType type, byte excluding) where T : NetworkMessage {
+        public static void Broadcast<T>(T message, byte channel, MessageType type, byte excluding) where T : NetworkMessage {
             Broadcast(message, channel, type, host.Connections[excluding]);
-        }
-
-        private static void OnConnect(Connection conn) {
-            var message = new WelcomeMessage {
-                id = conn.ID
-            };
-            conn.Send(message, 0, PacketType.Reliable);
         }
     }
 }

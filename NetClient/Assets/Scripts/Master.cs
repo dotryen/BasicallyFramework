@@ -7,6 +7,8 @@ using Basically.Networking;
 using Basically.Client;
 
 public class Master : Client {
+    float start = 0;
+
     private void Start() {
         SceneManager.sceneLoaded += (arg1, arg2) => {
             EntityManager.OnLoad();
@@ -18,8 +20,11 @@ public class Master : Client {
 
     private void OnGUI() {
         GUILayout.Label($"Connected: {NetworkClient.Connected}");
+        GUILayout.Label($"Bytes: {NetworkClient.BytesReceived / (Time.time - start)}");
+        GUILayout.Label($"Kilobytes: {Mathf.RoundToInt((NetworkClient.BytesReceived / (Time.time - start)) / 1000f)}");
         if (GUILayout.Button("Connect")) {
             Connect("localhost", 27020);
+            start = Time.time;
         }
     }
 }

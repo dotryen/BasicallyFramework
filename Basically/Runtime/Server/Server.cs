@@ -28,7 +28,7 @@ namespace Basically.Server {
         }
 
         private void OnDestroy() {
-            NetworkServer.StopServer();
+            StopServer();
             NetworkServer.Deinitialize();
         }
 
@@ -47,7 +47,7 @@ namespace Basically.Server {
             Physics2D.Simulate(Time.fixedDeltaTime);
 #endif
             if (snapshotDelay == 3) {
-                NetworkServer.Broadcast(SnapshotBuilder.CreateSnapshot(), 0, PacketType.Unreliable);
+                NetworkServer.Broadcast(SnapshotBuilder.CreateSnapshot(), 0, MessageType.Unreliable);
                 snapshotDelay = 0;
             } else {
                 snapshotDelay++;
@@ -64,7 +64,7 @@ namespace Basically.Server {
 #if PHYS_2D
             Physics2D.autoSimulation = false;
 #endif
-            NetworkServer.Initialize(channelCount);
+            NetworkServer.Initialize(channelCount, null);
             NetworkServer.StartServer(maxPlayers, port);
             ready = true;
         }

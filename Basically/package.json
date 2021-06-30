@@ -11,5 +11,6 @@
     "name": "riles",
     "email": "paperclip.riles@gmail.com"
   },
-  "type": "library"
+  "type": "library",
+  "dependencies": {}
 }

@@ -9,11 +9,9 @@ namespace Basically.Client {
     internal static class ClientReceivers {
         public static void Welcome(Connection conn, WelcomeMessage message) {
             NetworkClient.ID = message.id;
-            conn.Send(new WelcomeConfirmation() {
-                id = message.id
-            }, 0, PacketType.Reliable);
+            conn.Send(message, 0, MessageType.Reliable);
 
-            Debug.Log("WELCOME MESSAGE RECEIVED");
+            Debug.Log($"Welcome received. ID: {message.id}");
         }
 
         public static void EntityUpdate(Connection conn, WorldSnapshot message) {

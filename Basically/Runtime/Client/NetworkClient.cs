@@ -23,6 +23,11 @@ namespace Basically.Client {
                 return false;
             } 
         }
+        public static ulong BytesReceived { get {
+                if (!Connected) return 0;
+                else return host.Connections[0].peer.BytesReceived;
+            } 
+        }
 
         /// <summary>
         /// Initializes the Basically client.
@@ -32,6 +37,8 @@ namespace Basically.Client {
             if (host != null) return;
             host = new NetworkHost(channels);
             SerializerStorage.Initialize();
+            ActionCache.Initialize();
+
             AddReceiverClass(typeof(ClientReceivers));
         }
 
@@ -57,7 +64,7 @@ namespace Basically.Client {
         /// </summary>
         public static void Update() {
             if (host == null) return;
-            host.Update();
+            ActionCache.Execute();
         }
 
         /// <summary>
@@ -75,7 +82,7 @@ namespace Basically.Client {
         /// <param name="message">The packet.</param>
         /// <param name="channel">Which channel to send it to.</param>
         /// <param name="type">What kind of packet is it.</param>
-        public static void Send<T>(T message, byte channel, PacketType type) where T : NetworkMessage {
+        public static void Send<T>(T message, byte channel, MessageType type) where T : struct, NetworkMessage {
             if (host == null) return;
             if (Connected) host.Connections[0].Send(message, channel, type);
         }
@@ -89,7 +96,7 @@ namespace Basically.Client {
 
             foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Static)) {
                 if (!NetworkUtility.VerifyMethod(method)) continue;
-                host.AddReceiver(method.GetParameters()[1].ParameterType, NetworkUtility.GetDelegate(method));
+                host.AddReceiverInternal(method.GetParameters()[1].ParameterType, NetworkUtility.GetDelegate(method));
             }
         }
     }

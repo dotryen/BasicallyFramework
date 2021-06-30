@@ -11,6 +11,8 @@ namespace Basically.Client {
         public static Client Instance { get; private set; }
 
         public byte channelCount = 1;
+        [Range(0, 1)]
+        public float currentInterpTime = 0f;
 
         internal bool advance;
         internal int tick = 0;
@@ -32,7 +34,7 @@ namespace Basically.Client {
         }
 
         private void Update() {
-            NetworkClient.Update();   
+            NetworkClient.Update();
 
             if (advance) {
                 Interpolation.Update(Time.deltaTime);
@@ -61,6 +63,7 @@ namespace Basically.Client {
             Physics2D.autoSimulation = false;
 #endif
 
+            Interpolation.Initialize();
             NetworkClient.Initialize(channelCount);
             NetworkClient.ConnectToServer(ip, port);
         }

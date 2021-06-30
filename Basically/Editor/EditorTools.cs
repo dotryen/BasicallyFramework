@@ -19,9 +19,6 @@ public static class EditorTools {
 
     #region Defines
 
-    const string CLIENT_DEFINE = "BASICALLY_CLIENT";
-    const string SERVER_DEFINE = "BASICALLY_SERVER";
-
     static CompilerStorage Storage {
         get {
             var obj = AssetDatabase.LoadAssetAtPath<CompilerStorage>("Assets/Editor/Basically/Compiler.asset");
@@ -37,60 +34,103 @@ public static class EditorTools {
 
     [InitializeOnLoadMethod]
     static void Setup() {
-        if (!Storage.setup) {
-            Storage.client = true;
-            Storage.server = true;
-            Storage.setup = true;
+        if (Storage.setup) return;
 
-            UpdateDefines();
+        foreach (var field in typeof(CompilerStorage).GetFields()) {
+            field.SetValue(Storage, true);
         }
+
+        UpdateDefines();
     }
 
-    [MenuItem("Basically/Defines/Client")]
-    static void ToggleClientDefine() {
+    #region Client
+
+    [MenuItem("Basically/Project Type/Client")]
+    static void ClientDefine() {
         Storage.client = !Storage.client;
         UpdateDefines();
     }
 
-    [MenuItem("Basically/Defines/Client", true)]
+    [MenuItem("Basically/Project Type/Client", true)]
     static bool ClientValidate() {
-        Menu.SetChecked("Basically/Defines/Client", Storage.client);
+        Menu.SetChecked("Basically/Project Type/Client", Storage.client);
         return true;
     }
 
-    [MenuItem("Basically/Defines/Server")]
-    static void ToggleServerDefine() {
+    #endregion
+
+    #region Server
+
+    [MenuItem("Basically/Project Type/Server")]
+    static void ServerDefine() {
         Storage.server = !Storage.server;
         UpdateDefines();
     }
 
-    [MenuItem("Basically/Defines/Server", true)]
+    [MenuItem("Basically/Project Type/Server", true)]
     static bool ServerValidate() {
-        Menu.SetChecked("Basically/Defines/Server", Storage.server);
+        Menu.SetChecked("Basically/Project Type/Server", Storage.server);
         return true;
     }
 
+    #endregion
+
+    #region Entity
+
+    [MenuItem("Basically/Features/Entities")]
+    static void EntityDefine() {
+        Storage.entities = !Storage.entities;
+        UpdateDefines();
+    }
+
+    [MenuItem("Basically/Features/Entities", true)]
+    static bool EntityValidate() {
+        Menu.SetChecked("Basically/Features/Entities", Storage.entities);
+        return true;
+    }
+
+    #endregion
+
+    #region Mappacks
+
+    [MenuItem("Basically/Features/Mappacks")]
+    static void MappackDefine() {
+        Storage.mappacks = !Storage.mappacks;
+        UpdateDefines();
+    }
+
+    [MenuItem("Basically/Features/Mappacks", true)]
+    static bool MappackValidate() {
+        Menu.SetChecked("Basically/Features/Mappacks", Storage.mappacks);
+        return true;
+    }
+
+    #endregion
+
     static void UpdateDefines() {
         BuildTargetGroup group = EditorUserBuildSettings.selectedBuildTargetGroup;
-        var defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group).Split(';').ToList();
+        var currentDefines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group).Split(';').ToList();
 
-        if (defines.Contains(CLIENT_DEFINE)) {
-            if (!Storage.client) {
-                defines.Remove(CLIENT_DEFINE);
+        // get basically defines
+        Dictionary<string, bool> basicallyDefines = new Dictionary<string, bool>();
+        foreach (var field in typeof(CompilerStorage).GetFields()) {
+            if (field.Name == "setup") continue;
+            basicallyDefines.Add("BASICALLY_" + field.Name.ToUpper(), (bool)field.GetValue(Storage));
+        }
+        
+        foreach (var define in basicallyDefines) {
+            if (define.Value) {
+                if (!currentDefines.Contains(define.Key)) {
+                    currentDefines.Add(define.Key);
+                }
+            } else {
+                if (currentDefines.Contains(define.Key)) {
+                    currentDefines.Remove(define.Key);
+                }
             }
-        } else if (Storage.client) {
-            defines.Add(CLIENT_DEFINE);
         }
 
-        if (defines.Contains(SERVER_DEFINE)) {
-            if (!Storage.server) {
-                defines.Remove(SERVER_DEFINE);
-            }
-        } else if (Storage.server) {
-            defines.Add(SERVER_DEFINE);
-        }
-
-        PlayerSettings.SetScriptingDefineSymbolsForGroup(group, string.Join(";", defines));
+        PlayerSettings.SetScriptingDefineSymbolsForGroup(group, string.Join(";", currentDefines));
 
         // update object
         EditorUtility.SetDirty(Storage);

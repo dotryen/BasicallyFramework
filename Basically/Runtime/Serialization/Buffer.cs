@@ -63,8 +63,9 @@ namespace Basically.Serialization {
 
         private void WriteInternal(ByteConverter value, int bits) {
             var maxBits = array.Length * 8;
-            var newPos = writePos + bits;
-            if (newPos > maxBits - 1) {
+            // the resulting position is the position after the spot we just wrote to
+            var newPos = writePos + bits + 1;
+            if (newPos > maxBits) {
                 var remainingBits = newPos - maxBits;
                 Array.Resize(ref array, array.Length + Mathf.CeilToInt(remainingBits / 8f));
             }

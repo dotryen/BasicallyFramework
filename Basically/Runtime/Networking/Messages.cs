@@ -9,10 +9,6 @@ namespace Basically.Networking {
         public byte id;
     }
 
-    internal struct WelcomeConfirmation : NetworkMessage {
-        public byte id;
-    }
-
     internal struct WorldSnapshot : NetworkMessage {
         public int tick;
         public int[] ids;
