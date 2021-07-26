@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using Basically.Editor;
 
 [CustomEditor(typeof(CompilerStorage))]
 public class CompilerEditor : Editor {

@@ -7,7 +7,7 @@ namespace Basically.Networking {
         /// <summary>
         /// When a user connects and has successfully completed handshakes.
         /// </summary>
-        /// <param name="conn">Connection of the new user</param>
+        /// <param name="conn">Connection of the new user.</param>
         public virtual void OnConnect(Connection conn) {
 
         }
@@ -15,8 +15,16 @@ namespace Basically.Networking {
         /// <summary>
         /// When a user disconnects, the passing connection is not valid and should only be used to get data before reset, such as ID.
         /// </summary>
-        /// <param name="conn">Connection of the user</param>
-        public virtual void OnDisconnect(Connection conn) {
+        /// <param name="conn">Connection of the user.</param>
+        public virtual void OnDisconnect(Connection conn, uint data) {
+
+        }
+
+        /// <summary>
+        /// When a user times out, the passing connection is not valid and should only be used to get data before reset, such as ID.
+        /// </summary>
+        /// <param name="conn">Connection of the user.</param>
+        public virtual void OnTimeout(Connection conn) {
 
         }
 

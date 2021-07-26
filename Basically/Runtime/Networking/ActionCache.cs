@@ -5,10 +5,12 @@ using System.Collections.Concurrent;
 using UnityEngine;
 
 namespace Basically.Networking {
+
+    // TODO: Add message passing through ThreadData
     /// <summary>
     /// Carries actions over from different threads
     /// </summary>
-    internal static class ActionCache {
+    internal static class ThreadData {
         static ConcurrentQueue<Action> toExecute;
 
         public static void Initialize() {

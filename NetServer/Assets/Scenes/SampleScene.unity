@@ -164,7 +164,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79f5aadaf845c5e49a6997337a71b5df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  channelCount: 1
   player: {fileID: 8707855795465507690, guid: e6f7e76f249503044ab74588bc910db6, type: 3}
-  loaded: 0
-  delayThing: 0
-  tick: 0
+  game: {fileID: 1840998839583338999, guid: edae9a4829a7bf744bc926b1c5cf45f3, type: 3}

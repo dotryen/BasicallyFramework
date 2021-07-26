@@ -10,18 +10,13 @@ using Basically.Serialization;
 namespace Basically.Client {
     public static class NetworkClient {
         private static NetworkHost host;
+        internal static HostCallbacks originalCallbacks;
 
         public static byte ID { get; internal set; }
-        public static uint Ping => host.Connections[0].Ping / 2;
-        public static bool Connected { get {
-                if (host != null) {
-                    if (host.Connections != null) {
-                        return host.Connections[0].Connected;
-                    }
-                }
-                
-                return false;
-            } 
+        public static uint Ping { get {
+                if (host == null) return 0;
+                else return host.Connections[0].Ping;
+            }
         }
         public static ulong BytesReceived { get {
                 if (!Connected) return 0;
@@ -29,15 +24,29 @@ namespace Basically.Client {
             } 
         }
 
+        public static ConnectionStatus ConnectionStatus { get; internal set; } = ConnectionStatus.NotConnected;
+        public static bool Connected => ConnectionStatus == ConnectionStatus.Connected;
+
         /// <summary>
         /// Initializes the Basically client.
         /// </summary>
         /// <param name="channels">Channel limit for networking.</param>
-        public static void Initialize(int channels) {
+        public static void Initialize(int channels = 0xFF) {
             if (host != null) return;
-            host = new NetworkHost(channels);
-            SerializerStorage.Initialize();
-            ActionCache.Initialize();
+            host = new NetworkHost(channels, new ClientCallbacks());
+            originalCallbacks = null;
+
+            BasicallyCache.Initialize();
+
+            AddReceiverClass(typeof(ClientReceivers));
+        }
+
+        public static void Initialize(HostCallbacks callbacks, int channels = 0xFF) {
+            if (host != null) return;
+            host = new NetworkHost(channels, new ClientCallbacks());
+            originalCallbacks = callbacks;
+
+            BasicallyCache.Initialize();
 
             AddReceiverClass(typeof(ClientReceivers));
         }
@@ -47,6 +56,7 @@ namespace Basically.Client {
         /// </summary>
         public static void Deinitialize() {
             host = null;
+            originalCallbacks = null;
         }
 
         /// <summary>
@@ -60,11 +70,11 @@ namespace Basically.Client {
         }
 
         /// <summary>
-        /// Updates the host, must be updated costantly. (The update funtion)
+        /// Updates the host, must be updated constantly (The update funtion)
         /// </summary>
         public static void Update() {
             if (host == null) return;
-            ActionCache.Execute();
+            ThreadData.Execute();
         }
 
         /// <summary>

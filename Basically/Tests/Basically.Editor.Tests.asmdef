@@ -2,17 +2,15 @@
     "name": "Basically.Editor.Tests",
     "references": [
         "GUID:a8b910cf44979394f8c954c0e6b66825",
-        "GUID:27619889b8ba8c24980f49ee34dbb44a"
+        "GUID:7f5c0c4d9584112459af95bb7df8359f"
     ],
     "includePlatforms": [
         "Editor"
     ],
     "excludePlatforms": [],
-    "allowUnsafeCode": true,
-    "overrideReferences": true,
-    "precompiledReferences": [
-        "nunit.framework.dll"
-    ],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],

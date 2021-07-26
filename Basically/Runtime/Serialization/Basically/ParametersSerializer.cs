@@ -14,7 +14,7 @@ namespace Basically.Serialization {
                 var valueSerial = GetSerializer(pair.Value.GetType());
                 if (valueSerial == null) continue; // object has no serializer, why bother
 
-                buffer.Write(valueSerial.Index, SerializerStorage.SerializerBits);
+                buffer.Write(valueSerial.Index, BasicallyCache.SerializerBits);
                 stringSerial.Write(buffer, pair.Key);
                 valueSerial.WriteInternal(buffer, pair.Value);
             }
@@ -26,7 +26,7 @@ namespace Basically.Serialization {
             Parameters param = new Parameters(count);
 
             for (byte i = 0; i < count; i++) {
-                var valueSerial = GetSerializer(buffer.ReadByte(SerializerStorage.SerializerBits));
+                var valueSerial = GetSerializer(buffer.ReadByte(BasicallyCache.SerializerBits));
                 param.Add(stringSerial.Read(buffer), valueSerial.ReadInternal(buffer));
             }
 

@@ -22,20 +22,178 @@ MonoBehaviour:
   - UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
     PublicKeyToken=null
   serializer:
-  - Basically.Serialization.ParametersSerializer, Basically, Version=0.0.0.0, Culture=neutral,
+  - Basically.Networking.WelcomeMessage, Basically, Version=0.0.0.0, Culture=neutral,
     PublicKeyToken=null
-  - Basically.Serialization.StringSerializer, Basically, Version=0.0.0.0, Culture=neutral,
+  - Basically.Networking.WorldSnapshot, Basically, Version=0.0.0.0, Culture=neutral,
     PublicKeyToken=null
-  - Basically.Serialization.QuaternionSerializer, Basically, Version=0.0.0.0, Culture=neutral,
-    PublicKeyToken=null
-  - Basically.Serialization.Vector2Serializer, Basically, Version=0.0.0.0, Culture=neutral,
-    PublicKeyToken=null
-  - Basically.Serialization.Vector3Serializer, Basically, Version=0.0.0.0, Culture=neutral,
-    PublicKeyToken=null
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
   serializerBits: 3
   messages:
   - Basically.Networking.WelcomeMessage, Basically, Version=0.0.0.0, Culture=neutral,
     PublicKeyToken=null
   - Basically.Networking.WorldSnapshot, Basically, Version=0.0.0.0, Culture=neutral,
     PublicKeyToken=null
-  messageBits: 1
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  - Mono.Cecil.TypeDefinition, Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e
+  messageBits: 7

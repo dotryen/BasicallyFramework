@@ -18,7 +18,9 @@ public class Master : Client {
         SceneManager.LoadScene(1);
     }
 
-    private void OnGUI() {
+    protected override void OnGUI() {
+        base.OnGUI();
+
         GUILayout.Label($"Connected: {NetworkClient.Connected}");
         GUILayout.Label($"Bytes: {NetworkClient.BytesReceived / (Time.time - start)}");
         GUILayout.Label($"Kilobytes: {Mathf.RoundToInt((NetworkClient.BytesReceived / (Time.time - start)) / 1000f)}");

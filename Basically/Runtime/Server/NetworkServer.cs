@@ -5,11 +5,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Basically.Networking;
-using Basically.Serialization;
-using Basically.Utility;
 
 namespace Basically.Server {
+    using Networking;
+    using Serialization;
+    using Utility;
+
     public static class NetworkServer {
         private static NetworkHost host;
         internal static HostCallbacks originalCallbacks;
@@ -25,8 +26,7 @@ namespace Basically.Server {
             if (host != null) return;
 
             host = new NetworkHost(channels, new ServerCallbacks());
-            SerializerStorage.Initialize();
-            ActionCache.Initialize();
+            BasicallyCache.Initialize();
 
             AddReceiverClass(typeof(ServerReceivers));
             originalCallbacks = callbacks;
@@ -62,7 +62,7 @@ namespace Basically.Server {
         /// </summary>
         public static void Update() {
             if (host == null) return;
-            ActionCache.Execute();
+            ThreadData.Execute();
         }
 
         /// <summary>
@@ -86,6 +86,8 @@ namespace Basically.Server {
         /// <param name="channel">Which channel to send the message through.</param>
         /// <param name="type">What type of message is this.</param>
         public static void Broadcast<T>(T message, byte channel, MessageType type) where T : NetworkMessage {
+            if (ConnectedPlayers == 0) return;
+
             var payload = MessagePacker.SerializeMessage(message);
             var flags = (Networking.ENet.PacketFlags)type;
 
@@ -103,6 +105,8 @@ namespace Basically.Server {
         /// <param name="type">What type of message is this.</param>
         /// <param name="excluding">Which player/connection to exclude.</param>
         public static void Broadcast<T>(T message, byte channel, MessageType type, Connection excluding) where T : NetworkMessage {
+            if (ConnectedPlayers == 0) return;
+
             var payload = MessagePacker.SerializeMessage(message);
             var flags = (Networking.ENet.PacketFlags)type;
 

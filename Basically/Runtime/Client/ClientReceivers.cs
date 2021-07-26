@@ -11,16 +11,19 @@ namespace Basically.Client {
             NetworkClient.ID = message.id;
             conn.Send(message, 0, MessageType.Reliable);
 
+            NetworkClient.ConnectionStatus = ConnectionStatus.Connected;
+            NetworkClient.originalCallbacks?.OnConnect(conn);
+
             Debug.Log($"Welcome received. ID: {message.id}");
         }
 
         public static void EntityUpdate(Connection conn, WorldSnapshot message) {
+            Interpolation.AddState(message);
+
             if (!Client.Instance.advance) {
                 Client.Instance.tick = message.tick;
                 Client.Instance.advance = true;
             }
-
-            Interpolation.AddState(message);
         }
     }
 }

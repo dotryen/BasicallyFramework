@@ -40,5 +40,17 @@ namespace Basically.Networking {
             if (!TypeUtility.IsBaseType(typeof(NetworkMessage), param[1].ParameterType)) return false;
             return true;
         }
+
+        internal static void Log(object message) {
+            Debug.Log("NETWORKING LOG: " + message);
+        }
+
+        internal static void LogWarning(object message) {
+            Debug.LogWarning("NETWORKING WARNING: " + message);
+        }
+
+        internal static void LogError(object message) {
+            Debug.LogError("NETWORKING ERROR: " + message);
+        }
     }
 }

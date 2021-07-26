@@ -24,9 +24,7 @@ namespace Basically.Networking {
         /// Creates a new host with default settings.
         /// </summary>
         public NetworkHost() {
-            NetworkUtility.Initialize();
-            host = new Host();
-            receivers = new Dictionary<byte, Receiver>();
+            SharedConstruct();
 
             channelLimit = 0xFF;
             callbacks = new HostCallbacks();
@@ -37,9 +35,7 @@ namespace Basically.Networking {
         /// </summary>
         /// <param name="channels">Channel limit. (Max is 0xFF)</param>
         public NetworkHost(int channels) {
-            NetworkUtility.Initialize();
-            host = new Host();
-            receivers = new Dictionary<byte, Receiver>();
+            SharedConstruct();
 
             channelLimit = channels;
             callbacks = new HostCallbacks();
@@ -53,12 +49,19 @@ namespace Basically.Networking {
         public NetworkHost(int channels, HostCallbacks callbacks) {
             if (callbacks == null) throw new ArgumentNullException("Callbacks");
 
-            NetworkUtility.Initialize();
-            host = new Host();
-            receivers = new Dictionary<byte, Receiver>();
+            SharedConstruct();
 
             channelLimit = channels;
             this.callbacks = callbacks;
+        }
+
+        private void SharedConstruct() {
+            NetworkUtility.Initialize();
+            ThreadData.Initialize();
+            BufferPool.Initialize();
+
+            host = new Host();
+            receivers = new Dictionary<byte, Receiver>();
         }
 
         public void ConnectToHost(string ip, ushort port) {
@@ -137,7 +140,7 @@ namespace Basically.Networking {
                             if (canAccept) {
                                 connections[netEvent.Peer.ID].Setup(netEvent.Peer);
 
-                                ActionCache.Add(() => {
+                                ThreadData.Add(() => {
                                     callbacks.OnConnect(connections[netEvent.Peer.ID]);
                                 });
                                 break;
@@ -151,9 +154,9 @@ namespace Basically.Networking {
 
                     case EventType.Disconnect: {
                         // Reset to reuse connection
-                        ActionCache.Add(() => {
+                        ThreadData.Add(() => {
                             var conn = connections[netEvent.Peer.ID];
-                            callbacks.OnDisconnect(conn);
+                            callbacks.OnDisconnect(conn, netEvent.Data);
                             conn.Reset();
                         });
                         break;
@@ -161,24 +164,30 @@ namespace Basically.Networking {
 
                     case EventType.Timeout: {
                         // Reset to reuse connection
-                        ActionCache.Add(() => {
+                        ThreadData.Add(() => {
                             var conn = connections[netEvent.Peer.ID];
-                            callbacks.OnDisconnect(conn);
+                            callbacks.OnTimeout(conn);
                             conn.Reset();
                         });
                         break;
                     }
 
                     case EventType.Receive: {
+                        if (netEvent.Packet.Length > BufferPool.BUFFER_SIZE) {
+                            NetworkUtility.LogError("Packet received is too large for buffers inside pool.");
+                            // no backup, for now at least
+                            return;
+                        }
+
                         // get data
-                        Buffer buffer = new Buffer(netEvent.Packet.Length);
-                        netEvent.Packet.CopyTo(buffer);
+                        Buffer buffer = BufferPool.Get();
+                        netEvent.Packet.CopyTo(buffer.GetFullArray());
 
                         // get message
                         NetworkMessage message = MessagePacker.DeserializeMessage(buffer, out byte index);
 
                         // add to cache
-                        ActionCache.Add(() => {
+                        ThreadData.Add(() => {
                             var conn = connections[netEvent.Peer.ID];
                             callbacks.OnReceive(conn);
                             receivers[index](conn, message);
@@ -186,6 +195,7 @@ namespace Basically.Networking {
 
                         // dispose
                         netEvent.Packet.Dispose();
+                        BufferPool.Return(buffer);
                         break;
                     }
                 }
@@ -206,7 +216,7 @@ namespace Basically.Networking {
         internal void AddReceiverInternal(Type type, Receiver receiver) {
             if (receiver == null) throw new ArgumentNullException("Receiver");
 
-            byte index = SerializerStorage.GetMessageIndex(type);
+            byte index = BasicallyCache.GetMessageIndex(type);
             if (receivers.ContainsKey(index)) throw new Exception($"Receiver {index} already registered.");
             receivers.Add(index, receiver);
         }

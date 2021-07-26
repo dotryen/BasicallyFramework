@@ -24,7 +24,7 @@
  */
 
 // CHANGES:
-// Changned namespace and accessibility to hide from users. For simplicity sake.
+// Changed namespace and accessibility to hide from users. For simplicity sake.
 
 using System;
 using System.Runtime.InteropServices;

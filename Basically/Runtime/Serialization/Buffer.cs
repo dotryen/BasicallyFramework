@@ -11,7 +11,8 @@ namespace Basically.Serialization {
     /// Literally byte[] but better.
     /// </summary>
     public class Buffer {
-        byte[] array;
+        readonly byte[] array;
+        readonly int size;
 
         /// <summary>
         /// Which spot will be read.
@@ -33,15 +34,22 @@ namespace Basically.Serialization {
         /// </summary>
         public int CurrentWritePosition => writePos;
 
-        public Buffer() {
-            array = new byte[0];
-        }
+        /// <summary>
+        /// Gets the amount of writing space left in bits.
+        /// </summary>
+        public int UnwrittenLength => (size * 8) - writePos;
 
-        public Buffer(int size) {
+        /// <summary>
+        /// Gets the amount of reading space left in bits.
+        /// </summary>
+        public int UnreadLength => (size * 8) - readPos;
+
+        internal Buffer(int size) {
             array = new byte[size];
+            this.size = size;
         }
 
-        public Buffer(IEnumerable<byte> arr) {
+        internal Buffer(IEnumerable<byte> arr) {
             array = arr.ToArray();
             writePos = array.Length * 8;
         }
@@ -57,19 +65,10 @@ namespace Basically.Serialization {
         }
 
         public static implicit operator byte[](Buffer buffer) => buffer.ToArray();
-        public static implicit operator Buffer(byte[] arr) => new Buffer(arr);
 
         #region Write
 
         private void WriteInternal(ByteConverter value, int bits) {
-            var maxBits = array.Length * 8;
-            // the resulting position is the position after the spot we just wrote to
-            var newPos = writePos + bits + 1;
-            if (newPos > maxBits) {
-                var remainingBits = newPos - maxBits;
-                Array.Resize(ref array, array.Length + Mathf.CeilToInt(remainingBits / 8f));
-            }
-
             array.Write(value, ref writePos, bits);
         }
 
@@ -198,7 +197,25 @@ namespace Basically.Serialization {
 
         #endregion
 
+        public void Reset() {
+            for (int i = 0; i < array.Length; i++) {
+                array[i] = 0;
+            }
+
+            writePos = 0;
+            readPos = 0;
+        }
+
         public byte[] ToArray() {
+            var arr = new byte[Mathf.CeilToInt(writePos / 8f)];
+            for (int i = 0; i < arr.Length; i++) {
+                arr[i] = array[i];
+            }
+
+            return arr;
+        }
+
+        public byte[] GetFullArray() {
             return array;
         }
     }

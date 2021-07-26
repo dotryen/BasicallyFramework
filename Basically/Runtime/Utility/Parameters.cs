@@ -3,15 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace Basically.Utility {
-    public class Parameters : IEnumerable<KeyValuePair<string, object>> {
+    public struct Parameters : IEnumerable<KeyValuePair<string, object>> {
+        int[] keys;
+        object[] values;
         internal Dictionary<string, object> dictionary;
-
-        public Parameters() {
-            dictionary = new Dictionary<string, object>();
-        }
 
         public Parameters(byte size) {
             dictionary = new Dictionary<string, object>(size);
+            keys = new int[size];
+            values = new string[size];
         }
 
         public byte Count => (byte)dictionary.Count;

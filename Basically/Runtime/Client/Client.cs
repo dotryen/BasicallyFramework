@@ -6,18 +6,25 @@ using UnityEngine;
 
 namespace Basically.Client {
     using Entities;
+    using Networking;
 
     public class Client : MonoBehaviour {
         public static Client Instance { get; private set; }
 
         public byte channelCount = 1;
-        [Range(0, 1)]
-        public float currentInterpTime = 0f;
 
         internal bool advance;
         internal int tick = 0;
 
+        /// <summary>
+        /// Current client tick. Should match the server's.
+        /// </summary>
         public int Tick => tick;
+
+        /// <summary>
+        /// Tick expected on server when a message is sent.
+        /// </summary>
+        public int PredictedTick => tick + Mathf.FloorToInt(NetworkClient.Ping / NetworkTiming.TICK);
 
         private void Awake() {
             if (Instance != null) {
@@ -44,6 +51,11 @@ namespace Basically.Client {
         private void FixedUpdate() {
             if (!advance) return;
 
+            if (tick % NetworkTiming.STATE_TICKS_SKIPPED == 0) {
+                // multiple of ... whatever
+                Interpolation.Tick();
+            }
+
             EntityManager.ClientTick();
 #if PHYS_3D
             Physics.Simulate(Time.fixedDeltaTime);
@@ -54,8 +66,16 @@ namespace Basically.Client {
             tick++;
         }
 
+        protected virtual void OnGUI() {
+            if (advance) {
+                Interpolation.InterpolationGUI();
+            }
+        }
+
         public void Connect(string ip, ushort port) {
-            Time.fixedDeltaTime = Networking.NetworkTiming.TICK;
+            Time.fixedDeltaTime = NetworkTiming.TICK;
+            Time.maximumDeltaTime = NetworkTiming.TICK;
+
 #if PHYS_3D
             Physics.autoSimulation = false;
 #endif

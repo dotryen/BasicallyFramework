@@ -7,13 +7,19 @@ using Basically.Entities;
 
 public class Master : Server {
     public GameObject player;
+    public GameObject game;
 
     private void Start() {
         SceneManager.sceneLoaded += (arg1, arg2) => {
             EntityManager.OnLoad();
             EntityManager.ServerStart();
 
-            Instantiate(player, Vector3.back * 3, Quaternion.identity);
+            if (FindObjectOfType<Rigidbody>()) {
+                Instantiate(player, Vector3.back * 3, Quaternion.identity);
+            } else {
+                Instantiate(game);
+            }
+            
             StartServer(1, 27020);
         };
 

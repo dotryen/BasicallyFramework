@@ -9,6 +9,7 @@ namespace Basically.Networking {
         public byte id;
     }
 
+    [DeltaEncoded]
     internal struct WorldSnapshot : NetworkMessage {
         public int tick;
         public int[] ids;

@@ -13,7 +13,6 @@ namespace Basically.Server {
 
         public byte channelCount = 1;
         internal int tick = 0;
-        internal byte snapshotDelay;
         private bool ready = false;
 
         public int Tick => tick;
@@ -46,11 +45,8 @@ namespace Basically.Server {
 #if PHYS_2D
             Physics2D.Simulate(Time.fixedDeltaTime);
 #endif
-            if (snapshotDelay == 3) {
+            if (tick % NetworkTiming.STATE_TICKS_SKIPPED == 0) {
                 NetworkServer.Broadcast(SnapshotBuilder.CreateSnapshot(), 0, MessageType.Unreliable);
-                snapshotDelay = 0;
-            } else {
-                snapshotDelay++;
             }
 
             tick++;

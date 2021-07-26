@@ -8,7 +8,19 @@ using System.IO;
 #endif
 
 namespace Basically.Serialization {
-    public class SerializerStorage : ScriptableObject {
+    public class BasicallyCache : ScriptableObject {
+        [Serializable]
+        internal class SerializerCache {
+            public string[] inputs;
+            public string[] types;
+            public int bits;
+        }
+
+        [Serializable]
+        internal class MessageCache {
+            public string[] types;
+            public int bits;
+        }
 
         // serializer stuffs
         public string[] serializerTypes;
@@ -19,7 +31,7 @@ namespace Basically.Serialization {
         public string[] messages;
         public int messageBits;
 
-        static SerializerStorage instance;
+        static BasicallyCache instance;
         static Dictionary<Type, Serializer> serializerCache;
         static Dictionary<byte, Type> messageCache;
 
@@ -30,14 +42,14 @@ namespace Basically.Serialization {
 #if !UNITY_EDITOR
             if (instance) return;
 
-            instance = Resources.Load<SerializerStorage>("Basically/Storage");
+            instance = Resources.Load<BasicallyCache>("Basically/Storage");
             serializerCache = new Dictionary<Type, Serializer>();
             messageCache = new Dictionary<byte, Type>();
 #else
             if (Application.isPlaying) {
                 if (instance) return;
 
-                instance = Resources.Load<SerializerStorage>("Basically/Storage");
+                instance = Resources.Load<BasicallyCache>("Basically/Storage");
                 serializerCache = new Dictionary<Type, Serializer>();
                 messageCache = new Dictionary<byte, Type>();
             } else {
@@ -105,55 +117,15 @@ namespace Basically.Serialization {
         }
 
 #if UNITY_EDITOR
-        public static SerializerStorage GetAsset() {
-            var storage = AssetDatabase.LoadAssetAtPath<SerializerStorage>("Assets/Resources/Basically/Storage.asset");
+        public static BasicallyCache GetAsset() {
+            var storage = AssetDatabase.LoadAssetAtPath<BasicallyCache>("Assets/Resources/Basically/Storage.asset");
             if (!storage) {
-                storage = CreateInstance<SerializerStorage>();
+                storage = CreateInstance<BasicallyCache>();
                 Directory.CreateDirectory("Assets/Resources/Basically");
                 AssetDatabase.CreateAsset(storage, "Assets/Resources/Basically/Storage.asset");
             }
 
             return storage;
-        }
-
-        public void SetupSerializers(Dictionary<Type, Type> dic) {
-            if (dic.Count > (byte.MaxValue + 1)) throw new ArgumentException("Too large!!!!!");
-            serializerTypes = new string[dic.Count];
-            serializer = new string[dic.Count];
-
-            byte index = 0;
-            foreach (var pair in dic) {
-                serializerTypes[index] = pair.Key.AssemblyQualifiedName;
-                serializer[index] = pair.Value.AssemblyQualifiedName;
-                index++;
-            }
-
-            for (int i = 1; i < 8; i++) {
-                if (Mathf.Pow(2, i) >= dic.Count) {
-                    serializerBits = i;
-                    break;
-                }
-            }
-
-            EditorUtility.SetDirty(this);
-        }
-
-        public void SetupMessages(Type[] list) {
-            if (list.Length > (byte.MaxValue + 1)) throw new ArgumentException("Too large!!!!!!");
-            messages = new string[list.Length];
-
-            for (byte i = 0; i < list.Length; i++) {
-                messages[i] = list[i].AssemblyQualifiedName;
-            }
-
-            for (int i = 1; i < 8; i++) {
-                if (Mathf.Pow(2, i) >= list.Length) {
-                    messageBits = i;
-                    break;
-                }
-            }
-
-            EditorUtility.SetDirty(this);
         }
 #endif
     }

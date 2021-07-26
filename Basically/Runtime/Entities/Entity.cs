@@ -9,9 +9,13 @@ namespace Basically.Entities {
 
         internal virtual Vector3 tPosition => transform.position;
         internal virtual Quaternion tRotation => transform.rotation;
+
 #if BASICALLY_CLIENT
         internal int lastTickUpdated = 0;
+        public int LastTickReceived => lastTickUpdated;
 #endif
+        
+        #region Server
 
         protected internal virtual void OnServerStart() {
 
@@ -21,13 +25,27 @@ namespace Basically.Entities {
 
         }
 
+        #endregion
+
+        #region Client
+
         protected internal virtual void OnClientStart() {
+
+        }
+
+        protected internal virtual void OnClientUpdate() {
+
+        }
+
+        protected internal virtual void OnClientLateUpdate() {
 
         }
 
         protected internal virtual void OnClientTick() {
 
         }
+
+        #endregion
 
         protected internal virtual Parameters WriteData() {
             return null;

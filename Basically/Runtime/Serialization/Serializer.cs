@@ -66,15 +66,15 @@ namespace Basically.Serialization {
         #region Get Serializer
 
         protected Serializer<Type> GetSerializer<Type>() {
-            return SerializerStorage.GetSerializer<Type>();
+            return BasicallyCache.GetSerializer<Type>();
         }
 
         protected Serializer GetSerializer(byte index) {
-            return SerializerStorage.GetSerializer(index);
+            return BasicallyCache.GetSerializer(index);
         }
 
         protected Serializer GetSerializer(Type type) {
-            return SerializerStorage.GetSerializer(type);
+            return BasicallyCache.GetSerializer(type);
         }
 
         #endregion
@@ -87,7 +87,7 @@ namespace Basically.Serialization {
         // 
         // protected byte[] SerializeObject(Type type, object value) {
         //     if (type == typeof(T)) throw new ArgumentException("Type cannot be the same type as the serializer.");
-        //     Serializer serial = SerializerStorage.GetSerializer(type);
+        //     Serializer serial = BasicallyCache.GetSerializer(type);
         // 
         //     if (serial == null) throw new Exception("Type doesn't have a serialier");
         //     return serial.WriteInternal(value);
@@ -103,14 +103,14 @@ namespace Basically.Serialization {
 
         protected object DeserializeObject(Type type, Buffer buffer) {
             if (type == typeof(T)) throw new ArgumentException("Type cannot be the same type as the serializer.");
-            Serializer serial = SerializerStorage.GetSerializer(type);
+            Serializer serial = BasicallyCache.GetSerializer(type);
 
             if (serial == null) throw new Exception("Type doesn't have a serialier.");
             return serial.ReadInternal(buffer);
         }
 
         protected object DeserializeObject(byte index, Buffer buffer) {
-            Serializer serial = SerializerStorage.GetSerializer(index);
+            Serializer serial = BasicallyCache.GetSerializer(index);
             if (serial == null) throw new Exception("Index doesn't have a serializer.");
             if (serial.Type == Type) throw new Exception("Type cannot be the same type as the serializer.");
 

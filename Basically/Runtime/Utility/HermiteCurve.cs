@@ -26,13 +26,13 @@ public static class HermiteCurve {
 		// var d = t2 * (time - 1);
 		// return a * startPos + b * endPos + c * startDir + d * endDir;
 
-		 float time2 = time * time;
-		 float time3 = time * time * time;
+		float time2 = time * time;
+		float time3 = time * time * time;
 		 
-		 return (2.0f * time3 - 3.0f * time2 + 1.0f) * startPos
-		 	  + (time3 - 2.0f * time2 + time) * startDir
-		 	  + (-2.0f * time3 + 3.0f * time2) * endPos
-		 	  + (time3 - time2) * endDir;
+		return (((2.0f * time3) - (3.0f * time2) + 1.0f) * startPos)
+			  + ((time3 - (2.0f * time2) + time) * startDir)
+			  + (((-2.0f * time3) + (3.0f * time2)) * endPos)
+			  + ((time3 - time2) * endDir);
 	}
 
 	public static void DrawCurve(Vector3 startPos, Vector3 startDir, Vector3 endPos, Vector3 endDir, float time = 1) {

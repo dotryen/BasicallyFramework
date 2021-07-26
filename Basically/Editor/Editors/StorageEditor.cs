@@ -5,17 +5,17 @@ using UnityEngine;
 using UnityEditor;
 using Basically.Serialization;
 
-[CustomEditor(typeof(SerializerStorage))]
+[CustomEditor(typeof(BasicallyCache))]
 public class StorageEditor : Editor {
     bool showSerializers = false;
     bool showMessages = false;
 
-    SerializerStorage asset;
+    BasicallyCache asset;
     KeyValuePair<string, string>[] serializers;
     KeyValuePair<byte, string>[] messages;
 
     public void OnEnable() {
-        asset = SerializerStorage.GetAsset();
+        asset = BasicallyCache.GetAsset();
         serializers = new KeyValuePair<string, string>[asset.serializerTypes.Length];
         messages = new KeyValuePair<byte, string>[asset.messages.Length];
 

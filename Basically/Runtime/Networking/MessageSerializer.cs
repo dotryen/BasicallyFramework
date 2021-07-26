@@ -2,26 +2,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using Basically.Serialization;
-using Basically.Utility;
-using Buffer = Basically.Serialization.Buffer;
 
 namespace Basically.Networking {
+    using Serialization;
+
     public static class MessagePacker {
         const BindingFlags BINDING_FLAGS = BindingFlags.Public | BindingFlags.Instance;
+
+        // TODO: Change the packer to use pre-built methods for serializing and deserializing messages and auto types.
 
         #region Serialize
 
         public static byte[] SerializeMessage<T>(T message) where T : NetworkMessage {
-            Buffer buffer = new Buffer();
+            Buffer buffer = BufferPool.Get();
             Serializer serializer = null; // pretty much a buffer, it could be faster and easier
 
-            buffer.Write(SerializerStorage.GetMessageIndex(typeof(T)), SerializerStorage.MessageBits);
+            buffer.Write(BasicallyCache.GetMessageIndex(typeof(T)), BasicallyCache.MessageBits);
             foreach (var field in typeof(T).GetFields(BINDING_FLAGS)) {
                 SerializeField(buffer, ref serializer, field.GetValue(message));
             }
 
-            return buffer;
+            var result = buffer.ToArray();
+            BufferPool.Return(buffer);
+            return result;
         }
 
         private static void SerializeField(Buffer buffer, ref Serializer serializerRef, object value) {
@@ -66,9 +69,9 @@ namespace Basically.Networking {
             switch (code) {
                 default: {
                         if (serializerRef == null) {
-                            serializerRef = SerializerStorage.GetSerializer(type);
+                            serializerRef = BasicallyCache.GetSerializer(type);
                         } else if (serializerRef.Type != type) {
-                            serializerRef = SerializerStorage.GetSerializer(type);
+                            serializerRef = BasicallyCache.GetSerializer(type);
                         }
                         if (serializerRef == null) break; // there is no serializer for this
 
@@ -152,8 +155,8 @@ namespace Basically.Networking {
         #region Deserialize
 
         public static NetworkMessage DeserializeMessage(Buffer buffer, out byte index) {
-            index = buffer.ReadByte(SerializerStorage.MessageBits);
-            Type messageType = SerializerStorage.GetMessage(index);
+            index = buffer.ReadByte(BasicallyCache.MessageBits);
+            Type messageType = BasicallyCache.GetMessage(index);
             Serializer cache = null;
 
             NetworkMessage message = (NetworkMessage)Activator.CreateInstance(messageType);
@@ -211,9 +214,9 @@ namespace Basically.Networking {
             switch (code) {
                 default: {
                         if (serializerRef == null) {
-                            serializerRef = SerializerStorage.GetSerializer(type);
+                            serializerRef = BasicallyCache.GetSerializer(type);
                         } else if (serializerRef.Type != type) {
-                            serializerRef = SerializerStorage.GetSerializer(type);
+                            serializerRef = BasicallyCache.GetSerializer(type);
                         }
                         if (serializerRef == null) return null; // there is no serializer for this
 
