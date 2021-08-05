@@ -4,8 +4,10 @@ using UnityEngine;
 
 namespace Basically.Networking {
     public class HostCallbacks {
+        public NetworkHost Host { get; internal set; }
+
         /// <summary>
-        /// When a user connects and has successfully completed handshakes.
+        /// When a user connects to the host.
         /// </summary>
         /// <param name="conn">Connection of the new user.</param>
         public virtual void OnConnect(Connection conn) {

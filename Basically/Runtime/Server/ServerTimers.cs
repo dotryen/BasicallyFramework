@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if BASICALLY_SERVER
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Timers;
@@ -31,3 +33,5 @@ namespace Basically.Server {
         }
     }
 }
+
+#endif

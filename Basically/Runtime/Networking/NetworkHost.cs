@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Linq;
 using System.Threading;
 
 namespace Basically.Networking {
@@ -11,12 +13,17 @@ namespace Basically.Networking {
     public class NetworkHost {
         private Host host;
         private Connection[] connections;
-        private Dictionary<byte, Receiver> receivers;
+        private Dictionary<ushort, MessageDelegate> handlers;
+        internal HostCallbacks callbacks;
 
         private readonly int channelLimit;
         private bool ready;
-        private HostCallbacks callbacks;
         private Thread networkThread;
+
+        private object readerKey;
+        private object writerKey;
+
+        const int MAXIMUM_SIZE = 4 * 1024;
 
         public Connection[] Connections => connections;
 
@@ -53,15 +60,28 @@ namespace Basically.Networking {
 
             channelLimit = channels;
             this.callbacks = callbacks;
+            this.callbacks.Host = this;
         }
 
         private void SharedConstruct() {
             NetworkUtility.Initialize();
             ThreadData.Initialize();
-            BufferPool.Initialize();
+
+            // initialize pools
+            readerKey = Pool<Reader>.Create(5, () => {
+                return new Reader(MAXIMUM_SIZE);
+            }, (reader) => {
+                reader.Reset();
+            });
+
+            writerKey = Pool<Writer>.Create(5, () => {
+                return new Writer(MAXIMUM_SIZE);
+            }, (writer) => {
+                writer.Reset();
+            });
 
             host = new Host();
-            receivers = new Dictionary<byte, Receiver>();
+            handlers = new Dictionary<ushort, MessageDelegate>();
         }
 
         public void ConnectToHost(string ip, ushort port) {
@@ -101,13 +121,20 @@ namespace Basically.Networking {
             UnityEngine.Profiling.Profiler.BeginThreadProfiling("Basically", "Network");
 
             while (ready) {
+                ThreadData.ExecuteNet();
                 Update();
+                // NetworkUtility.Log("Host update ran"); // FUCK THIS LINE, IT LITERALLY FREEZES UNITY AND ATTEMPTS TO DESTROY MY COMPUTER
             }
 
             // disconnect everyone
             foreach (var conn in connections) {
                 conn.Disconnect();
             }
+            host.Flush();
+
+            // create new host
+            host.Dispose();
+            host = new Host();
 
             UnityEngine.Profiling.Profiler.EndThreadProfiling();
         }
@@ -140,7 +167,7 @@ namespace Basically.Networking {
                             if (canAccept) {
                                 connections[netEvent.Peer.ID].Setup(netEvent.Peer);
 
-                                ThreadData.Add(() => {
+                                ThreadData.AddUnity(() => {
                                     callbacks.OnConnect(connections[netEvent.Peer.ID]);
                                 });
                                 break;
@@ -154,7 +181,7 @@ namespace Basically.Networking {
 
                     case EventType.Disconnect: {
                         // Reset to reuse connection
-                        ThreadData.Add(() => {
+                        ThreadData.AddUnity(() => {
                             var conn = connections[netEvent.Peer.ID];
                             callbacks.OnDisconnect(conn, netEvent.Data);
                             conn.Reset();
@@ -164,7 +191,7 @@ namespace Basically.Networking {
 
                     case EventType.Timeout: {
                         // Reset to reuse connection
-                        ThreadData.Add(() => {
+                        ThreadData.AddUnity(() => {
                             var conn = connections[netEvent.Peer.ID];
                             callbacks.OnTimeout(conn);
                             conn.Reset();
@@ -173,29 +200,32 @@ namespace Basically.Networking {
                     }
 
                     case EventType.Receive: {
-                        if (netEvent.Packet.Length > BufferPool.BUFFER_SIZE) {
-                            NetworkUtility.LogError("Packet received is too large for buffers inside pool.");
+                        if (netEvent.Packet.Length > MAXIMUM_SIZE) {
+                            NetworkUtility.LogError("Packet received is too large for readers inside pool.");
                             // no backup, for now at least
                             return;
                         }
 
                         // get data
-                        Buffer buffer = BufferPool.Get();
-                        netEvent.Packet.CopyTo(buffer.GetFullArray());
+                        Reader reader = Pool<Reader>.Pull();
+                        netEvent.Packet.CopyTo(reader.ToArray());
 
                         // get message
-                        NetworkMessage message = MessagePacker.DeserializeMessage(buffer, out byte index);
+                        if (!Packer.Unpack(reader, out ushort header)) break;
 
-                        // add to cache
-                        ThreadData.Add(() => {
-                            var conn = connections[netEvent.Peer.ID];
-                            callbacks.OnReceive(conn);
-                            receivers[index](conn, message);
-                        });
+                        if (handlers.TryGetValue(header, out var del)) {
+                            ThreadData.AddUnity(() => {
+                                var conn = connections[netEvent.Peer.ID];
+                                callbacks.OnReceive(conn);
+                                del(conn, reader);
+                                Pool<Reader>.Push(reader);
+                            });
+                        } else {
+                            Pool<Reader>.Push(reader);
+                        }
 
                         // dispose
                         netEvent.Packet.Dispose();
-                        BufferPool.Return(buffer);
                         break;
                     }
                 }
@@ -203,28 +233,31 @@ namespace Basically.Networking {
         }
 
         public void Stop() {
-            if (!ready) return;
             ready = false;
         }
 
         #region Utility
 
-        public void AddReceiver<T>(Receiver receiver) where T : struct, NetworkMessage {
-            AddReceiverInternal(typeof(T), receiver);
+        public void AddReceiver<T>(Action<Connection, T> handler, bool requireAuth = true) where T : struct, NetworkMessage {
+            ushort header = Packer.GetId<T>();
+            handlers[header] = Packer.Wrap(handler, requireAuth);
         }
 
-        internal void AddReceiverInternal(Type type, Receiver receiver) {
-            if (receiver == null) throw new ArgumentNullException("Receiver");
+        public void AddReceiverClass(Type type) {
+            var attr = (ReceiverClassAttribute)type.GetCustomAttributes(typeof(ReceiverClassAttribute)).FirstOrDefault();
+            if (attr == null) return;
 
-            byte index = BasicallyCache.GetMessageIndex(type);
-            if (receivers.ContainsKey(index)) throw new Exception($"Receiver {index} already registered.");
-            receivers.Add(index, receiver);
+            var method = type.GetMethod("_Init", BindingFlags.Public | BindingFlags.Static);
+            method.Invoke(null, new object[] { this });
+            NetworkUtility.Log($"{type.FullName} initialized.");
         }
 
         private void PopulateConnections(byte count) {
             connections = new Connection[count];
             for (int i = 0; i < count; i++) {
-                connections[i] = new Connection();
+                connections[i] = new Connection {
+                    host = this
+                };
             }
         }
 

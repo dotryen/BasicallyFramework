@@ -32,6 +32,7 @@ namespace Basically.Server {
         }
 
         private void Update() {
+            if (!ready) return;
             NetworkServer.Update();
         }
 
@@ -45,6 +46,7 @@ namespace Basically.Server {
 #if PHYS_2D
             Physics2D.Simulate(Time.fixedDeltaTime);
 #endif
+            // TODO: UNCOMMENT THIS AFTER FIXING OTHER SHIT
             if (tick % NetworkTiming.STATE_TICKS_SKIPPED == 0) {
                 NetworkServer.Broadcast(SnapshotBuilder.CreateSnapshot(), 0, MessageType.Unreliable);
             }

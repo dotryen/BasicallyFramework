@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Basically.Utility;
 
 [ExecuteAlways]
 public class Curve : MonoBehaviour {

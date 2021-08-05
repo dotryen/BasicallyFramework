@@ -84,5 +84,10 @@ namespace Basically.Editor.Weaver {
             Menu.SetChecked(MENU_BUTTON, Paused);
             return true;
         }
+
+        [MenuItem("Basically/Weaver/Weave")]
+        static void DoWeave() {
+            WeaverHook.WeaveExistingAssemblies();
+        }
     }
 }

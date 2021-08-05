@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using Mono.Cecil;
 
 namespace Basically.Editor.Weaver {
@@ -15,7 +16,20 @@ namespace Basically.Editor.Weaver {
             return Is(td, typeof(T));
         }
 
+        public static bool HasCustomAttribute<T>(this ICustomAttributeProvider provider, out CustomAttribute attr) where T : Attribute {
+            if (provider.HasCustomAttributes) {
+                var result = provider.CustomAttributes.FirstOrDefault(x => x.AttributeType.Is<T>());
+                if (result != null) {
+                    attr = result;
+                    return true;
+                }
+            }
+            attr = null;
+            return false;
+        }
+
         public static bool HasCustomAttribute<T>(this ICustomAttributeProvider provider) where T : Attribute {
+            // return HasCustomAttribute<T>(provider, out _);
             return provider.CustomAttributes.Any(x => x.AttributeType.Is<T>());
         }
 
@@ -33,6 +47,10 @@ namespace Basically.Editor.Weaver {
             }
 
             return false;
+        }
+
+        public static bool Implements<T>(this TypeReference tr) {
+            return tr.Resolve().Implements<T>();
         }
 
         public static bool Inherits<T>(this TypeReference td) => Inherits(td.Resolve(), typeof(T));
@@ -66,7 +84,7 @@ namespace Basically.Editor.Weaver {
             return true;
         }
 
-        public static MethodReference MakeHostInstanceGeneric(this MethodReference self, GenericInstanceType type) {
+        public static MethodReference MakeHostInstanceGeneric(this MethodReference self, GenericInstanceType type, ModuleDefinition module) {
             MethodReference refer = new MethodReference(self.Name, self.ReturnType, type) {
                 CallingConvention = self.CallingConvention,
                 HasThis = self.HasThis,
@@ -81,7 +99,7 @@ namespace Basically.Editor.Weaver {
                 refer.GenericParameters.Add(new GenericParameter(genParam.Name, refer));
             }
 
-            return refer;
+            return module.ImportReference(refer);
         }
 
         public static FieldReference SpecializeField(this FieldReference self, GenericInstanceType type) {
@@ -90,6 +108,43 @@ namespace Basically.Editor.Weaver {
 
         public static bool IsMultidimensionalArray(this TypeReference type) {
             return type is ArrayType arrayType && arrayType.Rank > 1;
+        }
+
+        public static IEnumerable<FieldDefinition> FindAllPublicFields(this TypeReference refer) {
+            return FindAllPublicFields(refer.Resolve());
+        }
+
+        public static IEnumerable<FieldDefinition> FindAllPublicFields(this TypeDefinition type) {
+            while (type != null) {
+                foreach (var field in type.Fields) {
+                    if (field.IsStatic || field.IsPrivate) continue;
+                    if (field.IsNotSerialized) continue;
+                    yield return field;
+                }
+
+                try {
+                    type = type.BaseType?.Resolve();
+                } catch (AssemblyResolutionException) {
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Prevents an error when resolving from the same module.
+        /// </summary>
+        public static TypeDefinition SafeResolve(this TypeReference tr, ModuleDefinition module) {
+            var result = module.Types.FirstOrDefault(x => x.Name == tr.Name);
+            if (result == null) {
+                return tr.Resolve();
+            } else {
+                return result;
+            }
+        }
+
+        public static Type GetSystemType(this TypeReference tr) {
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.Load(tr.Module.Assembly.FullName);
+            return assembly.GetType(tr.FullName);
         }
     }
 }

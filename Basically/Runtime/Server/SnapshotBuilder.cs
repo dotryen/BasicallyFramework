@@ -18,15 +18,13 @@ namespace Basically.Server {
                 ids = new int[count],
                 positions = new Vector3[count],
                 quaternions = new Quaternion[count],
-                parameters = new Parameters[count]
             };
 
             for (int i = 0; i < count; i++) {
                 var ent = EntityManager.entities[i];
                 snap.ids[i] = ent.ID;
-                snap.positions[i] = ent.tPosition;
-                snap.quaternions[i] = ent.tRotation;
-                snap.parameters[i] = ent.WriteData();
+                snap.positions[i] = ent.Position;
+                snap.quaternions[i] = ent.Rotation;
             }
 
             return snap;

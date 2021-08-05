@@ -1,31 +1,30 @@
 ﻿#if BASICALLY_CLIENT
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using Basically.Networking;
-using Basically.Serialization;
+using UnityEngine;
 
 namespace Basically.Client {
+    using Networking;
+
     public static class NetworkClient {
         private static NetworkHost host;
         internal static HostCallbacks originalCallbacks;
 
-        public static byte ID { get; internal set; }
-        public static uint Ping { get {
-                if (host == null) return 0;
-                else return host.Connections[0].Ping;
+        public static Connection Connection {
+            get {
+                if (host == null) return null;
+                return host.Connections[0];
             }
         }
-        public static ulong BytesReceived { get {
-                if (!Connected) return 0;
-                else return host.Connections[0].peer.BytesReceived;
-            } 
+
+        public static bool Connected {
+            get {
+                if (Connection == null) return false;
+                return Connection.Connected;
+            }
         }
 
-        public static ConnectionStatus ConnectionStatus { get; internal set; } = ConnectionStatus.NotConnected;
-        public static bool Connected => ConnectionStatus == ConnectionStatus.Connected;
+        public static byte ID { get; internal set; }
 
         /// <summary>
         /// Initializes the Basically client.
@@ -36,8 +35,6 @@ namespace Basically.Client {
             host = new NetworkHost(channels, new ClientCallbacks());
             originalCallbacks = null;
 
-            BasicallyCache.Initialize();
-
             AddReceiverClass(typeof(ClientReceivers));
         }
 
@@ -45,8 +42,6 @@ namespace Basically.Client {
             if (host != null) return;
             host = new NetworkHost(channels, new ClientCallbacks());
             originalCallbacks = callbacks;
-
-            BasicallyCache.Initialize();
 
             AddReceiverClass(typeof(ClientReceivers));
         }
@@ -74,7 +69,7 @@ namespace Basically.Client {
         /// </summary>
         public static void Update() {
             if (host == null) return;
-            ThreadData.Execute();
+            ThreadData.ExecuteUnity();
         }
 
         /// <summary>
@@ -82,7 +77,7 @@ namespace Basically.Client {
         /// </summary>
         public static void Disconnect() {
             if (host == null) return;
-            host.Stop();
+            Connection.Disconnect();
         }
 
         /// <summary>
@@ -93,8 +88,8 @@ namespace Basically.Client {
         /// <param name="channel">Which channel to send it to.</param>
         /// <param name="type">What kind of packet is it.</param>
         public static void Send<T>(T message, byte channel, MessageType type) where T : struct, NetworkMessage {
-            if (host == null) return;
-            if (Connected) host.Connections[0].Send(message, channel, type);
+            if (Connection == null) return;
+            Connection.Send(message, channel, type);
         }
 
         /// <summary>
@@ -103,11 +98,7 @@ namespace Basically.Client {
         /// <param name="type">Class where receivers are contained.</param>
         public static void AddReceiverClass(Type type) {
             if (host == null) return;
-
-            foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Static)) {
-                if (!NetworkUtility.VerifyMethod(method)) continue;
-                host.AddReceiverInternal(method.GetParameters()[1].ParameterType, NetworkUtility.GetDelegate(method));
-            }
+            host.AddReceiverClass(type);
         }
     }
 }

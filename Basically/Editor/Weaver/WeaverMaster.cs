@@ -20,8 +20,8 @@ namespace Basically.Editor.Weaver {
         }
 
         static TypeDefinition genClass = null;
-        static List<Weaver> editorWeavers;
-        static List<Weaver> playerWeavers;
+        static List<Weaver> editorWeavers = new List<Weaver>();
+        static List<Weaver> playerWeavers = new List<Weaver>();
 
         internal static void Start() {
             var assemblies = new List<UAssembly>();
@@ -95,8 +95,8 @@ namespace Basically.Editor.Weaver {
                 play.Reset();
             }
 
-            editorWeavers = null;
-            playerWeavers = null;
+            editorWeavers.Clear();
+            playerWeavers.Clear();
         }
 
         private static Weaver[] GetAllWeavers(bool editor) {

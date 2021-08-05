@@ -22,11 +22,20 @@ public class Master : Client {
         base.OnGUI();
 
         GUILayout.Label($"Connected: {NetworkClient.Connected}");
-        GUILayout.Label($"Bytes: {NetworkClient.BytesReceived / (Time.time - start)}");
-        GUILayout.Label($"Kilobytes: {Mathf.RoundToInt((NetworkClient.BytesReceived / (Time.time - start)) / 1000f)}");
-        if (GUILayout.Button("Connect")) {
-            Connect("localhost", 27020);
-            start = Time.time;
+        if (NetworkClient.Connected) {
+            var bytes = NetworkClient.Connection.BytesReceived;
+            GUILayout.Label($"Bytes: {bytes / (Time.time - start)}");
+            GUILayout.Label($"Kilobytes: {Mathf.RoundToInt((bytes / (Time.time - start)) / 1000f)}");
+        }
+        if (!NetworkClient.Connected) {
+            if (GUILayout.Button("Connect")) {
+                Connect("localhost", 27020);
+                start = Time.time;
+            }
+        } else {
+            if (GUILayout.Button("Disconnect")) {
+                Disconnect(0);
+            }
         }
     }
 }

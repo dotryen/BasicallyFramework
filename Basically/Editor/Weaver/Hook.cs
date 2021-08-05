@@ -8,18 +8,23 @@ using UnityEditor.Compilation;
 
 namespace Basically.Editor.Weaver {
     internal static class WeaverHook {
+        static bool currentWeaveFailed;
+
         [InitializeOnLoadMethod]
         static void OnLoad() {
+            // return;
+
             WeaverControls.Initialize();
 
             CompilationPipeline.compilationStarted += (obj) => {
                 if (!WeaverControls.Paused) {
+                    currentWeaveFailed = false;
                     WeaverMaster.Start();
                 }
             };
 
             CompilationPipeline.assemblyCompilationFinished += (ass, mes) => {
-                if (WeaverControls.Paused) {
+                if (WeaverControls.Paused || currentWeaveFailed) {
                     WeaverControls.TriedWeave = true;
                 } else {
                     OnAssemblyCompile(ass, mes);
@@ -29,17 +34,24 @@ namespace Basically.Editor.Weaver {
             CompilationPipeline.compilationFinished += (objElectricBoogaloo) => {
                 if (!WeaverControls.Paused) {
                     WeaverMaster.End();
+                    EditorUtility.RequestScriptReload();
                 }
             };
 
-            WeaveExistingAssemblies();
+            if (!WeaverControls.Ready) WeaveExistingAssemblies();
             Debug.Log("Weaver callbacks successfully added.");
         }
 
         public static void WeaveExistingAssemblies() {
+            currentWeaveFailed = false;
+            WeaverMaster.Start();
+
             foreach (var asm in CompilationPipeline.GetAssemblies()) {
+                if (currentWeaveFailed) break;
                 OnAssemblyCompile(asm.outputPath, new CompilerMessage[0]);
             }
+
+            WeaverMaster.End();
         }
 
         #region Hook
@@ -48,6 +60,8 @@ namespace Basically.Editor.Weaver {
         public const string EDITOR_DLL = RUNTIME_DLL + ".Editor";
 
         internal static void OnAssemblyCompile(string assemblyPath, CompilerMessage[] messages) {
+            if (!File.Exists(AsmUtil.GetBasicallyAssembly(Platform.Player).outputPath)) return;
+
             bool isEditor = false;
 
             void Work(string include) {
@@ -55,7 +69,15 @@ namespace Basically.Editor.Weaver {
                 depend.Add(Path.GetDirectoryName(UnityCoreModule()));
                 if (include != null) depend.Add(Path.GetDirectoryName(include));
 
-                WeaverControls.WeaveFailed = !WeaverMaster.Weave(assemblyPath, depend.ToArray(), isEditor);
+                bool status = true;
+                try {
+                    status = WeaverMaster.Weave(assemblyPath, depend.ToArray(), isEditor);
+                } catch (System.Exception) {
+                    status = false;
+                }
+
+                WeaverControls.WeaveFailed = !status;
+                currentWeaveFailed = !status;
             }
 
             void Check(string asm) {

@@ -23,7 +23,7 @@ namespace Basically.Client {
                     states[i] = new EntityState() {
                         position = snap.positions[i],
                         rotation = snap.quaternions[i],
-                        parameters = snap.parameters[i]
+                        parameters = default
                     };
                 }
             }
@@ -79,7 +79,6 @@ namespace Basically.Client {
                 for (int i = 0; i < EntityManager.entities.Length; i++) {
                     var ent = EntityManager.entities[i];
 
-                    DoEntityRead(ent, from.tick, from.states[i].parameters);
                     ent.Interpolate(from.states[i], to.states[i], amount);
                 }
                 Debug.Log($"INTERP: From Tick: {from.tick}, To Tick: {to.tick}, Amount: {amount}");
@@ -104,16 +103,8 @@ namespace Basically.Client {
                 var id = state.ids[i];
                 var ent = EntityManager.entities[id];
 
-                DoEntityRead(ent, state.tick, state.states[id].parameters);
                 ent.transform.position = state.states[id].position;
                 ent.transform.rotation = state.states[id].rotation;
-            }
-        }
-
-        private static void DoEntityRead(Entity ent, int tick, Parameters param) {
-            if (ent.lastTickUpdated < tick) {
-                ent.ReadData(param);
-                ent.lastTickUpdated = tick;
             }
         }
 

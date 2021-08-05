@@ -24,7 +24,7 @@ namespace Basically.Client {
         /// <summary>
         /// Tick expected on server when a message is sent.
         /// </summary>
-        public int PredictedTick => tick + Mathf.FloorToInt(NetworkClient.Ping / NetworkTiming.TICK);
+        public int PredictedTick => tick + Mathf.FloorToInt(NetworkClient.Connection.Ping / NetworkTiming.TICK);
 
         private void Awake() {
             if (Instance != null) {
@@ -73,6 +73,8 @@ namespace Basically.Client {
         }
 
         public void Connect(string ip, ushort port) {
+            if (NetworkClient.Connected) return;
+
             Time.fixedDeltaTime = NetworkTiming.TICK;
             Time.maximumDeltaTime = NetworkTiming.TICK;
 
