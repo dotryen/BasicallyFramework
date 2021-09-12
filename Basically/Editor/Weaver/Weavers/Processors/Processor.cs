@@ -9,8 +9,11 @@ namespace Basically.Editor.Weaver {
     internal abstract class Processor {
         Dictionary<TypeReference, MethodReference> all;
         Dictionary<TypeReference, MethodReference> allBit;
+        Dictionary<TypeReference, MethodReference> allDelta;
+
         Dictionary<TypeReference, MethodReference> current;
         Dictionary<TypeReference, MethodReference> currentBit;
+        Dictionary<TypeReference, MethodReference> currentDelta;
 
         ModuleDefinition mainModule;
         TypeDefinition genClass;
@@ -18,6 +21,9 @@ namespace Basically.Editor.Weaver {
         private Processor() {
             all = CreateDictionary();
             allBit = CreateDictionary();
+            allDelta = CreateDictionary();
+
+            currentDelta = CreateDictionary();
             currentBit = CreateDictionary();
             current = CreateDictionary();
         }
@@ -80,4 +86,6 @@ namespace Basically.Editor.Weaver {
 
         public abstract void BitToRegular();
     }
+
+    internal enum MethodType { Normal, Bit, Delta }
 }

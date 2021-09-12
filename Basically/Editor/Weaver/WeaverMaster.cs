@@ -29,6 +29,7 @@ namespace Basically.Editor.Weaver {
             assemblies.Add(AsmUtil.GetBasicallyAssembly(Platform.Editor));
 
             foreach (var asm in assemblies) {
+                if (!File.Exists(asm.outputPath)) continue;
                 var weavers = asm.LoadAssembly(false).GetAllDescendantsOf(typeof(Weaver)).Select(x => (Weaver)Activator.CreateInstance(x));
 
                 foreach (var weav in weavers) {

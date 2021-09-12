@@ -12,8 +12,6 @@ namespace Basically.Editor.Weaver {
 
         [InitializeOnLoadMethod]
         static void OnLoad() {
-            // return;
-
             WeaverControls.Initialize();
 
             CompilationPipeline.compilationStarted += (obj) => {
@@ -34,11 +32,15 @@ namespace Basically.Editor.Weaver {
             CompilationPipeline.compilationFinished += (objElectricBoogaloo) => {
                 if (!WeaverControls.Paused) {
                     WeaverMaster.End();
-                    EditorUtility.RequestScriptReload();
+                    // EditorUtility.RequestScriptReload();
                 }
             };
 
-            if (!WeaverControls.Ready) WeaveExistingAssemblies();
+            if (!WeaverControls.StartupWeave) {
+                WeaveExistingAssemblies();
+                WeaverControls.StartupWeave = true;
+            }
+
             Debug.Log("Weaver callbacks successfully added.");
         }
 
@@ -52,6 +54,12 @@ namespace Basically.Editor.Weaver {
             }
 
             WeaverMaster.End();
+
+#if UNITY_2019_3_OR_NEWER
+            EditorUtility.RequestScriptReload();
+#else
+            UnityEditorInternal.InternalEditorUtility.RequestScriptReload();
+#endif
         }
 
         #region Hook
@@ -60,6 +68,7 @@ namespace Basically.Editor.Weaver {
         public const string EDITOR_DLL = RUNTIME_DLL + ".Editor";
 
         internal static void OnAssemblyCompile(string assemblyPath, CompilerMessage[] messages) {
+            if (!File.Exists(assemblyPath)) return;
             if (!File.Exists(AsmUtil.GetBasicallyAssembly(Platform.Player).outputPath)) return;
 
             bool isEditor = false;

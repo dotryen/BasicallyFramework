@@ -25,62 +25,6 @@ namespace Basically.Editor.Weaver {
 
         #region Helpers
 
-        #region Attributes
-
-        public bool HasAttribute<T>(FieldDefinition field, out CustomAttribute attribute) where T : System.Attribute {
-            if (!field.HasCustomAttributes) {
-                attribute = null;
-                return false;
-            }
-
-            string name = typeof(T).FullName;
-            foreach (var attr in field.CustomAttributes) {
-                if (attr.AttributeType.FullName != name) continue;
-
-                attribute = attr;
-                return true;
-            }
-
-            attribute = null;
-            return false;
-        }
-
-        public bool HasAttribute<T>(PropertyDefinition property, out CustomAttribute attribute) where T : System.Attribute {
-            if (!property.HasCustomAttributes) {
-                attribute = null;
-                return false;
-            }
-
-            string name = typeof(T).FullName;
-            foreach (var attr in property.CustomAttributes) {
-                if (attr.AttributeType.FullName != name) continue;
-
-                attribute = attr;
-                return true;
-            }
-
-            attribute = null;
-            return false;
-        }
-
-        public bool HasAttribute<T>(MethodDefinition method, out CustomAttribute attribute) where T : System.Attribute {
-            if (!method.HasCustomAttributes) {
-                attribute = null;
-                return false;
-            }
-
-            string name = typeof(T).FullName;
-            foreach (var attr in method.CustomAttributes) {
-                if (attr.AttributeType.FullName != name) continue;
-
-                attribute = attr;
-                return true;
-            }
-
-            attribute = null;
-            return false;
-        }
-
         public CustomAttribute CreateAttrbute<T>(params object[] args) where T : Attribute {
             var con = typeof(T).GetConstructor(args.Select(x => x.GetType()).ToArray());
             if (con == null) throw new ArgumentException("Arguments are invalid.", "args");
@@ -93,44 +37,6 @@ namespace Basically.Editor.Weaver {
 
             return attr;
         }
-
-        #endregion
-
-        #region Types
-
-        public TypeDefinition[] GetDescendants<T>() {
-            return GetDescendants(typeof(T));
-        }
-
-        public TypeDefinition[] GetDescendants(Type type) {
-            if (type.IsInterface) {
-                return Module.Types.Where((x) => {
-                    if (x.FullName == "<Module>") return false;
-                    return x.Interfaces.Any(y => y.InterfaceType.FullName == type.FullName);
-                }).ToArray();
-            } else {
-                return Module.Types.Where((x) => {
-                    if (x.FullName == "<Module>") return false;
-                    if (x.BaseType == null) return false;
-                    return x.BaseType.FullName.StartsWith(type.FullName);
-                }).ToArray();
-            }
-        }
-
-        public TypeDefinition GetDescendant<T>() {
-            return GetDescendant(typeof(T));
-        }
-
-        public TypeDefinition GetDescendant(Type type) {
-            var types = GetDescendants(type);
-            return types.Length != 0 ? types[0] : null;
-        }
-
-        public TypeDefinition GetType<T>() {
-            return Module.Types.First(x => x.FullName == typeof(T).FullName);
-        }
-
-        #endregion
 
         #endregion
     }

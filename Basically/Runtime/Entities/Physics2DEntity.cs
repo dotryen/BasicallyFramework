@@ -8,6 +8,10 @@ namespace Basically.Entities {
     using Utility;
     using Networking;
 
+    /// <summary>
+    /// A 2D physics entity
+    /// </summary>
+    [AddComponentMenu("Basically/Entities/Phys2D Entity")]
     [RequireComponent(typeof(Rigidbody2D))]
     public class Physics2DEntity : Entity {
         public new Rigidbody2D rigidbody;
@@ -31,17 +35,19 @@ namespace Basically.Entities {
             // Debug.DrawRay(rigidbody.position, rigidbody.velocity);
         }
 
+        protected internal override Parameters Serialize() {
+            var param = new Parameters(1);
+            param.Add("vel", rigidbody.velocity);
+            return param;
+        }
+
         protected internal override void Interpolate(EntityState from, EntityState to, float interpAmount) {
-            base.Interpolate(from, to, interpAmount);
-            return;
+            Vector2 fromVel = from.parameters.Get<Vector2>("vel") * Time.deltaTime;
+            Vector2 toVel = to.parameters.Get<Vector2>("vel") * Time.deltaTime;
 
-            Vector2 fromVel = (Vector2)from.parameters["vel"];
-            Vector2 toVel = (Vector2)to.parameters["vel"];
-
-            transform.position = HermiteCurve.Sample(from.position, fromVel, to.position, toVel, interpAmount);
-            // transform.position = Vector2.Lerp(from.position, to.position, interpAmount);
+            transform.position = Curves.Hermite(from.position, fromVel, to.position, toVel, interpAmount);
             transform.rotation = Quaternion.Slerp(from.rotation, to.rotation, interpAmount);
-            HermiteCurve.DrawCurve(from.position, fromVel, to.position, toVel);
+            // HermiteCurve.DrawCurve(from.position, fromVel, to.position, toVel);
         }
     }
 }

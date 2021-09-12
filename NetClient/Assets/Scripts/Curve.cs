@@ -18,6 +18,6 @@ public class Curve : MonoBehaviour {
     public Point end;
 
     public void Update() {
-        HermiteCurve.DrawCurve(start.Position, start.Tangent, end.Position, end.Tangent, Time.deltaTime);
+        // HermiteCurve.DrawCurve(start.Position, start.Tangent, end.Position, end.Tangent, Time.deltaTime);
     }
 }

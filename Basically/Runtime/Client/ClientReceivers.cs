@@ -6,6 +6,8 @@ using UnityEngine;
 using Basically.Networking;
 
 namespace Basically.Client {
+    using Frameworks;
+
     [ReceiverClass]
     internal static class ClientReceivers {
         [NoAuth]
@@ -32,9 +34,9 @@ namespace Basically.Client {
         public static void EntityUpdate(Connection conn, WorldSnapshot message) {
             Interpolation.AddState(message);
 
-            if (!Client.Instance.advance) {
-                Client.Instance.tick = message.tick;
-                Client.Instance.advance = true;
+            if (!ClientFramework.Instance.advance) {
+                ClientFramework.Instance.tick = message.tick;
+                ClientFramework.Instance.advance = true;
             }
         }
     }

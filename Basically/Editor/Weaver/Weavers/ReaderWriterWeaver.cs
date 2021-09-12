@@ -40,6 +40,10 @@ namespace Basically.Editor.Weaver {
                 readerProcessor.GetReadFunc(type);
             }
 
+            // foreach (var ent in Module.Types.Where(x => x.Inherits<Entities.Entity>())) {
+            // 
+            // }
+
             var method = CreateInitMethod();
             var worker = method.Body.GetILProcessor();
 

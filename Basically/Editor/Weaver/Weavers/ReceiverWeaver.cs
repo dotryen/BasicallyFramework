@@ -12,8 +12,10 @@ namespace Basically.Editor.Weaver {
         public override int Priority => 0;
         public override bool IsEditor => false;
 
+        System.Reflection.MethodInfo addReceiverInfo;
+
         public override void Weave() {
-            var addRef = Module.ImportReference(typeof(NetworkHost).GetMethod(nameof(NetworkHost.AddReceiver)));
+            addReceiverInfo = typeof(MethodHandler).GetMethod(nameof(MethodHandler.AddReceiver));
 
             foreach (var type in Module.Types.Where(x => x.IsSealed && x.IsAbstract)) {
                 if (!type.HasCustomAttribute<ReceiverClassAttribute>(out var attr)) continue;
@@ -40,7 +42,7 @@ namespace Basically.Editor.Weaver {
             const MethodAttributes ATTRIBUTES = MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig;
             var method = new MethodDefinition("_Init", ATTRIBUTES, Module.ImportReference(typeof(void)));
 
-            method.Parameters.Add(new ParameterDefinition("host", ParameterAttributes.None, Module.ImportReference(typeof(NetworkHost))));
+            method.Parameters.Add(new ParameterDefinition("host", ParameterAttributes.None, Module.ImportReference(typeof(MethodHandler))));
             method.Body.InitLocals = true;
 
             return method;
@@ -62,7 +64,7 @@ namespace Basically.Editor.Weaver {
 
             // add to receiver
             worker.Emit(noAuth ? OpCodes.Ldc_I4_0 : OpCodes.Ldc_I4_1);
-            var add = Module.ImportReference(typeof(NetworkHost).GetMethod(nameof(NetworkHost.AddReceiver)).MakeGenericMethod(parameter));
+            var add = Module.ImportReference(addReceiverInfo.MakeGenericMethod(parameter));
             worker.Emit(OpCodes.Callvirt, add);
 
             worker.Emit(OpCodes.Nop);

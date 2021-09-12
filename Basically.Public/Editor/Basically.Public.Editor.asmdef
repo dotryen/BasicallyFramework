@@ -1,0 +1,23 @@
+{
+    "name": "Basically.Public.Editor",
+    "references": [
+        "GUID:ccdb4c2c403c09d4a8e028d368b73d19"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.riles.basically",
+            "expression": "",
+            "define": "BASICALLY_INSTALLED"
+        }
+    ],
+    "noEngineReferences": false
+}

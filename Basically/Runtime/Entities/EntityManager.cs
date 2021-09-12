@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Basically.Entities {
     using Utility;
@@ -13,9 +15,15 @@ namespace Basically.Entities {
         public static void OnLoad() {
             entities = Object.FindObjectsOfType<Entity>();
 
-            for (int i = 0; i < entities.Length; i++) {
+            for (ushort i = 0; i < entities.Length; i++) {
                 entities[i].ID = i;
             }
+        }
+
+        public static void RegisterEntity(Entity entity) {
+            entity.ID = (ushort)entities.Length;
+            Array.Resize(ref entities, entities.Length + 1);
+            entities[entity.ID] = entity;
         }
 
 #if BASICALLY_SERVER
@@ -51,7 +59,7 @@ namespace Basically.Entities {
 #endif
     }
 
-    public class EntityState {
+    public struct EntityState {
         public Vector3 position;
         public Quaternion rotation;
         public Parameters parameters;

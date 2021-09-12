@@ -130,6 +130,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1522527014}
+  - component: {fileID: 1522527015}
   - component: {fileID: 1522527013}
   m_Layer: 0
   m_Name: Master
@@ -147,12 +148,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1522527012}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 79f5aadaf845c5e49a6997337a71b5df, type: 3}
+  m_Script: {fileID: 11500000, guid: d1bcb905bcf77744d82992689364b75b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  channelCount: 1
-  player: {fileID: 8707855795465507690, guid: e6f7e76f249503044ab74588bc910db6, type: 3}
-  game: {fileID: 1840998839583338999, guid: edae9a4829a7bf744bc926b1c5cf45f3, type: 3}
 --- !u!4 &1522527014
 Transform:
   m_ObjectHideFlags: 0
@@ -167,3 +165,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1522527015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1522527012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01e11c090e8045d478876be5e569f887, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxPlayers: 16
+  port: 27020

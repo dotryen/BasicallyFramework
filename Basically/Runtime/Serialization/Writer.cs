@@ -3,19 +3,8 @@ using emotitron.Compression;
 using emotitron.Compression.Utilities;
 using UnityEngine;
 
-// god mirror does a lot of clever things
 namespace Basically.Serialization {
-    using Networking;
     using Utility;
-
-    /// <summary>
-    /// Writing shit.
-    /// </summary>
-    /// <typeparam name="T">Message type.</typeparam>
-    internal static class Writer<T> {
-        public static Action<Writer, T> write;
-        public static Action<Writer, T, int> writeBit;
-    }
 
     public class Writer {
         readonly byte[] arr;
@@ -31,7 +20,7 @@ namespace Basically.Serialization {
         }
 
         public void Write<T>(T value) {
-            Action<Writer, T> act = Writer<T>.write;
+            Action<Writer, T> act = TypeData<T>.write;
             if (act == null) {
                 Debug.LogError($"No writer for {typeof(T)}");
             } else {
@@ -40,7 +29,7 @@ namespace Basically.Serialization {
         }
 
         public void Write<T>(T value, int bits) {
-            Action<Writer, T, int> act = Writer<T>.writeBit;
+            Action<Writer, T, int> act = TypeData<T>.writeBit;
             if (act == null) {
                 Debug.LogError($"No bit writer for {typeof(T)}");
             } else {
@@ -123,13 +112,29 @@ namespace Basically.Serialization {
         }
         public static void WriteArray<T>(this Writer writer, T[] value) {
             if (value == null) {
-                writer.WriteInt(-1);
-                return;
+                writer.WriteBool(false);
+            } else {
+                writer.WriteBool(true);
+                writer.WriteInt(value.Length);
+                for (int i = 0; i < value.Length; i++) {
+                    writer.Write(value[i]);
+                }
             }
-            writer.WriteInt(value.Length);
-            for (int i = 0; i < value.Length; i++) {
-                writer.Write(value[i]);
+        }
+        public static void WriteParameters(this Writer writer, Parameters value) {
+            if (value.Count == 0) {
+                writer.WriteBool(false);
+            } else {
+                writer.WriteBool(true);
+                writer.WriteByte(value.Count);
+                for (int i = 0; i < value.Count; i++) {
+                    writer.WriteInt(value.keys[i]);
+                    writer.WriteArray(value.valuesBytes[i]);
+                }
             }
+        }
+        public static void WriteString(this Writer writer, string value) {
+            writer.WriteArray(System.Text.Encoding.UTF8.GetBytes(value));
         }
     }
 }

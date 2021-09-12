@@ -1,0 +1,19 @@
+{
+    "name": "Basically.Public",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.riles.basically",
+            "expression": "",
+            "define": "BASICALLY_INSTALLED"
+        }
+    ],
+    "noEngineReferences": false
+}

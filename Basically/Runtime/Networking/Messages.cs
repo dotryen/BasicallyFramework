@@ -5,6 +5,7 @@ using UnityEngine;
 namespace Basically.Networking {
     using Serialization;
     using Utility;
+    using Entities;
 
     internal struct WelcomeMessage : NetworkMessage {
         public byte id;
@@ -16,13 +17,16 @@ namespace Basically.Networking {
 
     [DeltaEncoded]
     internal struct WorldSnapshot : NetworkMessage {
-        public int tick;
-        public int[] ids;
-        public Vector3[] positions;
-        public Quaternion[] quaternions;
+        public uint tick;
+        public ushort[] ids;
+        public EntityState[] states;
     }
 
     internal struct DeltaConfirm : NetworkMessage {
         // TODO: Add delta confirmations
+    }
+
+    public struct PlayerEnter : NetworkMessage {
+        public byte id;
     }
 }

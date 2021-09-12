@@ -14,17 +14,17 @@ namespace Basically.Client {
         public byte channelCount = 1;
 
         internal bool advance;
-        internal int tick = 0;
+        internal uint tick = 0;
 
         /// <summary>
         /// Current client tick. Should match the server's.
         /// </summary>
-        public int Tick => tick;
+        public uint Tick => tick;
 
         /// <summary>
         /// Tick expected on server when a message is sent.
         /// </summary>
-        public int PredictedTick => tick + Mathf.FloorToInt(NetworkClient.Connection.Ping / NetworkTiming.TICK);
+        public uint PredictedTick => (uint)(tick + Mathf.FloorToInt(NetworkClient.Connection.Ping / NetworkTiming.TICK));
 
         private void Awake() {
             if (Instance != null) {
@@ -51,11 +51,6 @@ namespace Basically.Client {
         private void FixedUpdate() {
             if (!advance) return;
 
-            if (tick % NetworkTiming.STATE_TICKS_SKIPPED == 0) {
-                // multiple of ... whatever
-                Interpolation.Tick();
-            }
-
             EntityManager.ClientTick();
 #if PHYS_3D
             Physics.Simulate(Time.fixedDeltaTime);
@@ -67,9 +62,9 @@ namespace Basically.Client {
         }
 
         protected virtual void OnGUI() {
-            if (advance) {
-                Interpolation.InterpolationGUI();
-            }
+            // if (advance) {
+            //     Interpolation.InterpolationGUI();
+            // }
         }
 
         public void Connect(string ip, ushort port) {
@@ -86,7 +81,8 @@ namespace Basically.Client {
 #endif
 
             Interpolation.Initialize();
-            NetworkClient.Initialize(channelCount);
+
+            NetworkClient.Initialize(null);
             NetworkClient.ConnectToServer(ip, port);
         }
 

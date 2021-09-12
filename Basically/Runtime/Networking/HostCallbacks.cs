@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Basically.Networking {
     public class HostCallbacks {
-        public NetworkHost Host { get; internal set; }
+        public Transport Host { get; internal set; }
 
         /// <summary>
         /// When a user connects to the host.

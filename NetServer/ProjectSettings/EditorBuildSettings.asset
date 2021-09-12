@@ -9,12 +9,14 @@ EditorBuildSettings:
     path: Assets/Scenes/Scene.unity
     guid: f364cfa5da4ce104ba7009096e2612c2
   - enabled: 1
-    path: Packages/com.riles.assets/3DSoloCube.unity
-    guid: 123577fb753d0774a8e3f9c232207371
+    path: Packages/com.riles.assets/Scenes/3DTest.unity
+    guid: bc3b778f8ff16f34c91c9eaf6e1391a0
   - enabled: 1
-    path: Packages/com.riles.assets/2DTest.unity
+    path: Packages/com.riles.assets/Scenes/2DTest.unity
     guid: bf68f8a1d2883814da52de8b9fa921fc
   - enabled: 1
-    path: Packages/com.riles.assets/3DTest.unity
-    guid: bc3b778f8ff16f34c91c9eaf6e1391a0
-  m_configObjects: {}
+    path: Packages/com.riles.assets/Scenes/3DSoloCube.unity
+    guid: 123577fb753d0774a8e3f9c232207371
+  m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: 035c7e0c326a6224fbf3ee0a1ce5fecd,
+      type: 2}

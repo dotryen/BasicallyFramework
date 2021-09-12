@@ -12,5 +12,7 @@
     "email": "paperclip.riles@gmail.com"
   },
   "type": "library",
-  "dependencies": {}
+  "dependencies": {
+    "com.riles.basically.public": ""
+  }
 }

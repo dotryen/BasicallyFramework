@@ -4,10 +4,7 @@ using emotitron.Compression.Utilities;
 using UnityEngine;
 
 namespace Basically.Serialization {
-    internal static class Reader<T> {
-        public static Func<Reader, T> read;
-        public static Func<Reader, int, T> readBit;
-    }
+    using Utility;
 
     public class Reader {
         readonly byte[] arr;
@@ -23,7 +20,7 @@ namespace Basically.Serialization {
         }
 
         public T Read<T>() {
-            var act = Reader<T>.read;
+            var act = TypeData<T>.read;
             if (act == null) {
                 Debug.LogError($"No reader for {typeof(T)}");
                 return default;
@@ -33,7 +30,7 @@ namespace Basically.Serialization {
         }
 
         public T Read<T>(int bits) {
-            var act = Reader<T>.readBit;
+            var act = TypeData<T>.readBit;
             if (act == null) {
                 Debug.LogError($"No bit reader for {typeof(T)}");
                 return default;
@@ -101,14 +98,30 @@ namespace Basically.Serialization {
             return QuatCompress.Decompress(ReadByte(reader, 2), ReadUShort(reader, 9), ReadUShort(reader, 9), ReadUShort(reader, 9));
         }
         public static T[] ReadArray<T>(this Reader reader) {
+            if (!reader.ReadBool()) return null;
             var length = reader.ReadInt();
-            if (length == -1) return null;
 
             var arr = new T[length];
             for (int i = 0; i < length; i++) {
                 arr[i] = reader.Read<T>();
             }
             return arr;
+        }
+        public static Parameters ReadParemeters(this Reader reader) {
+            if (!reader.ReadBool()) return default;
+
+            byte length = reader.ReadByte();
+            var param = new Parameters(length);
+
+            for (int i = 0; i < length; i++) {
+                param.keys[i] = reader.ReadInt();
+                param.valuesBytes[i] = reader.ReadArray<byte>();
+            }
+
+            return param;
+        }
+        public static string ReadString(this Reader reader) {
+            return System.Text.Encoding.UTF8.GetString(reader.ReadArray<byte>());
         }
     }
 }

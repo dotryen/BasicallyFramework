@@ -1,0 +1,16 @@
+{
+    "name": "bruhssembly",
+    "references": [
+        "GUID:a8b910cf44979394f8c954c0e6b66825",
+        "GUID:ccdb4c2c403c09d4a8e028d368b73d19"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

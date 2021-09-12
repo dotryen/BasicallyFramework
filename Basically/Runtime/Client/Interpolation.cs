@@ -9,121 +9,98 @@ namespace Basically.Client {
     using Networking;
 
     public static class Interpolation {
-        internal class WorldState {
-            public int tick;
-            public int[] ids;
-            public EntityState[] states;
+        internal struct InterpState {
+            public float time;
+            public WorldSnapshot world;
 
-            public WorldState(WorldSnapshot snap) {
-                tick = snap.tick;
-                ids = snap.ids;
-                states = new EntityState[ids.Length];
-
-                for (int i = 0; i < snap.ids.Length; i++) {
-                    states[i] = new EntityState() {
-                        position = snap.positions[i],
-                        rotation = snap.quaternions[i],
-                        parameters = default
-                    };
-                }
+            public InterpState(float time, WorldSnapshot snap) {
+                this.time = time;
+                world = snap;
             }
         }
 
-        // extra two frames for jitter and shit
-        const int BUFFER_SIZE = 4;
-        static WorldState[] buffer;
-        static int bufferSpot = 0; // snapshots are never shot out each tick, so this counteracts that
+        static List<InterpState> buffer;
+
+        // STATE
+        static bool playing;
+        static bool initialized;
 
         // TIME
         static float time;
-        static int lastTick;
+        static float mark = 0f;
+        
+        // RECORDS
+        static InterpState lastState;
+        static uint lastTick;
 
         internal static void Initialize() {
-            buffer = new WorldState[BUFFER_SIZE];
-            // interpTicks = Mathf.FloorToInt(NetworkTiming.INTERP_TIME_TICK); // moves states ahead to allow for new snapshots (for dial-up era lol)
-            // interpTicks = 0; // this is better
+            buffer = new List<InterpState>();
+
+            playing = false;
+            initialized = false;
+
             time = 0;
+            mark = 0;
+
+            lastState = default;
             lastTick = 0;
-            bufferSpot = 0;
         }
 
         internal static void AddState(WorldSnapshot snap) {
             if (snap.tick <= lastTick) return;
-
-            buffer[BufferPos(bufferSpot)] = new WorldState(snap);
+            buffer.Add(new InterpState(time, snap));
             lastTick = snap.tick;
-            // bufferSpot++;
-            // Debug.Log($"Adding state {snap.tick} to position {bufferSpot}");
         }
 
         public static void Update(float delta) {
-            time += delta;
-
-            WorldState from;
-            WorldState to;
-            int toPos;
-            int fromPos;
-
-            { // Get States
-                toPos = Mathf.CeilToInt(time / NetworkTiming.SNAPSHOT_INTERVAL);
-                fromPos = Mathf.FloorToInt(time / NetworkTiming.SNAPSHOT_INTERVAL);
-                to = buffer[BufferPos(toPos)];
-                from = buffer[BufferPos(fromPos)];
-            }
-            
-            // Interpolation Shit
-
-            if (from != null && to != null) { // Interpolate
-                var amount = Mathf.InverseLerp(fromPos * NetworkTiming.SNAPSHOT_INTERVAL, toPos * NetworkTiming.SNAPSHOT_INTERVAL, time);
-
-                for (int i = 0; i < EntityManager.entities.Length; i++) {
-                    var ent = EntityManager.entities[i];
-
-                    ent.Interpolate(from.states[i], to.states[i], amount);
+            if (!playing) {
+                if (buffer.Count > 0 && !initialized) {
+                    lastState = buffer[0];
+                    initialized = true;
+                    buffer.RemoveAt(0);
                 }
-                Debug.Log($"INTERP: From Tick: {from.tick}, To Tick: {to.tick}, Amount: {amount}");
-            } else if (from == null && to != null) { // Snap
-                Snap(to);
-                Debug.Log("Snapping: TO");
-            } else if (from != null && to == null) {
-                Snap(from);
-                Debug.Log("Snapping: FROM");
-            } else { // we cant really do anything without data
-                Debug.LogError("INTERP: To and From are null!");
+
+                if (buffer.Count > 0 && initialized) {
+                    playing = true;
+                }
+            } else {
+                while (buffer.Count > 0 && mark > buffer[0].time) {
+                    lastState = buffer[0];
+                    buffer.RemoveAt(0);
+                }
+
+                if (buffer.Count > 0) {
+                    if (buffer[0].time > 0) {
+                        var alpha = (mark - lastState.time) / (buffer[0].time - lastState.time);
+
+                        for (int i = 0; i < lastState.world.ids.Length; i++) {
+                            var ent = EntityManager.entities[lastState.world.ids[i]];
+                            ent.Interpolate(lastState.world.states[i], buffer[0].world.states[i], alpha);
+                        }
+                    }
+                }
+
+                mark += delta;
             }
+
+            time += delta;
         }
 
-        public static void Tick() {
-            buffer[BufferPos(bufferSpot + 1)] = null;
-            bufferSpot++;
-        }
-
-        private static void Snap(WorldState state) {
-            for (int i = 0; i < state.ids.Length; i++) {
-                var id = state.ids[i];
+        private static void Snap(InterpState state) {
+            for (int i = 0; i < state.world.ids.Length; i++) {
+                var id = state.world.ids[i];
                 var ent = EntityManager.entities[id];
 
-                ent.transform.position = state.states[id].position;
-                ent.transform.rotation = state.states[id].rotation;
+                ent.transform.position = state.world.states[id].position;
+                ent.transform.rotation = state.world.states[id].rotation;
             }
         }
 
-        private static int BufferPos(int tick) => Mathf.Max(0, tick % BUFFER_SIZE);
-
-        internal static void InterpolationGUI() {
-            GUILayout.Label("Interpolation:");
-            for (int i = 0; i < BUFFER_SIZE; i++) {
-                string output = $"{i} ";
-
-                if (buffer[i] == null) output += "= null ";
-                else output += "= taken ";
-
-                if (BufferPos(bufferSpot) == i) output += "(Current)";
-
-                GUILayout.Label(output);
-            }
-
-            GUILayout.Space(10);
+        public static void InterpolationGUI() {
+            GUILayout.Box($"Interpolation:\nStates: {buffer.Count}\nMark: {mark}\nTime: {time}");
+            // GUILayout.Label($"Interpolation: {buffer.Count} states");
+            // GUILayout.Label($"    Mark: {mark}");
+            // GUILayout.Label($"    Time: {time}");
         }
     }
 }

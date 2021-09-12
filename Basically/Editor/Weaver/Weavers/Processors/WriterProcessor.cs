@@ -11,8 +11,11 @@ namespace Basically.Editor.Weaver {
     internal class WriterProcessor {
         Dictionary<TypeReference, MethodReference> allWrites;
         Dictionary<TypeReference, MethodReference> allBitWrites;
+        Dictionary<TypeReference, MethodReference> allDeltaWrites;
+
         Dictionary<TypeReference, MethodReference> currentWrites;
         Dictionary<TypeReference, MethodReference> currentBitWrites;
+        Dictionary<TypeReference, MethodReference> currentDeltaWrites;
 
         ModuleDefinition mainModule;
         TypeDefinition genClass;
@@ -310,16 +313,24 @@ namespace Basically.Editor.Weaver {
             return method;
         }
 
+        MethodDefinition GenerateEntityFunc(TypeReference tr) {
+            var method = GenerateWriterFunc(tr);
+
+
+
+            return method;
+        }
+
         /// <summary>
-        /// Save a delegate for each one of the writers into <see cref="Writer{T}.write"/>
+        /// Save a delegate for each one of the writers into <see cref="TypeData{T}.write"/>
         /// </summary>
         /// <param name="worker"></param>
         internal void InitializeWriters(ILProcessor worker) {
-            TypeReference genericWriterClassRef = mainModule.ImportReference(typeof(Writer<>));
+            TypeReference genericWriterClassRef = mainModule.ImportReference(typeof(TypeData<>));
             TypeReference writerRef = mainModule.ImportReference(typeof(Writer));
 
             { // bit pass
-                System.Reflection.FieldInfo fieldInfo = typeof(Writer<>).GetField(nameof(Writer<object>.writeBit));
+                System.Reflection.FieldInfo fieldInfo = typeof(TypeData<>).GetField(nameof(TypeData<object>.writeBit));
                 FieldReference fieldRef = mainModule.ImportReference(fieldInfo);
                 TypeReference actionRef = mainModule.ImportReference(typeof(Action<,,>));
                 TypeReference intRef = mainModule.ImportReference(typeof(int));
@@ -344,7 +355,7 @@ namespace Basically.Editor.Weaver {
             }
 
             { // regular pass
-                System.Reflection.FieldInfo fieldInfo = typeof(Writer<>).GetField(nameof(Writer<object>.write));
+                System.Reflection.FieldInfo fieldInfo = typeof(TypeData<>).GetField(nameof(TypeData<object>.write));
                 FieldReference fieldRef = mainModule.ImportReference(fieldInfo);
                 TypeReference actionRef = mainModule.ImportReference(typeof(Action<,>));
                 MethodReference actionConstructorRef = mainModule.ImportReference(typeof(Action<,>).GetConstructors()[0]);

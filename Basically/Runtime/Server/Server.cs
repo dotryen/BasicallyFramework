@@ -12,10 +12,7 @@ namespace Basically.Server {
         public static Server Instance { get; private set; }
 
         public byte channelCount = 1;
-        internal int tick = 0;
         private bool ready = false;
-
-        public int Tick => tick;
 
         private void Awake() {
             if (Instance != null) {
@@ -39,19 +36,11 @@ namespace Basically.Server {
         private void FixedUpdate() {
             if (!ready) return;
 
-            EntityManager.ServerTick();
-#if PHYS_3D
-            Physics.Simulate(Time.fixedDeltaTime);
-#endif
-#if PHYS_2D
-            Physics2D.Simulate(Time.fixedDeltaTime);
-#endif
-            // TODO: UNCOMMENT THIS AFTER FIXING OTHER SHIT
-            if (tick % NetworkTiming.STATE_TICKS_SKIPPED == 0) {
-                NetworkServer.Broadcast(SnapshotBuilder.CreateSnapshot(), 0, MessageType.Unreliable);
-            }
+            GameHistory.OnTick();
 
-            tick++;
+            if (GameHistory.SnapshotReady) {
+                NetworkServer.Broadcast(GameHistory.LatestRecord, 0, MessageType.Unreliable);
+            }
         }
 
         public void StartServer(byte maxPlayers, ushort port) {
@@ -62,7 +51,8 @@ namespace Basically.Server {
 #if PHYS_2D
             Physics2D.autoSimulation = false;
 #endif
-            NetworkServer.Initialize(channelCount, null);
+            GameHistory.Initialize();
+            NetworkServer.Initialize();
             NetworkServer.StartServer(maxPlayers, port);
             ready = true;
         }

@@ -7,8 +7,9 @@ namespace Basically.Entities {
     /// <summary>
     /// In-Game objects that synced from the server and interpolated.
     /// </summary>
+    [AddComponentMenu("Basically/Entities/Entity")]
     public class Entity : MonoBehaviour {
-        public int ID { get; internal set; }
+        public ushort ID { get; internal set; }
 
         public virtual Vector3 Position => transform.position;
         public virtual Quaternion Rotation => transform.rotation;
@@ -62,6 +63,14 @@ namespace Basically.Entities {
         }
 
         #endregion
+
+        protected internal virtual Parameters Serialize() {
+            return default;
+        }
+
+        protected internal virtual void Deserialize() {
+
+        }
 
         protected internal virtual void Interpolate(EntityState from, EntityState to, float interpAmount) {
             transform.position = Vector3.Lerp(from.position, to.position, interpAmount);

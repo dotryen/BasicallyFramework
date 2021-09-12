@@ -607,7 +607,7 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLWasmStreaming: 0
   scriptingDefineSymbols:
-    1: BASICALLY_ENTITIES;BASICALLY_MAPPACKS;BASICALLY_SERVER;BASICALLY_CLIENTFAKE
+    1: BASICALLY_ENTITIES;BASICALLY_MAPPACKS;BASICALLY_SERVER
   platformArchitecture: {}
   scriptingBackend: {}
   il2cppCompilerConfiguration: {}

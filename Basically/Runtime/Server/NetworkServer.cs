@@ -11,23 +11,31 @@ namespace Basically.Server {
     using Utility;
 
     public static class NetworkServer {
-        private static NetworkHost host;
+        private static Transport host;
         internal static HostCallbacks originalCallbacks;
+        internal static MethodHandler handler;
 
+        public static MethodHandler Handler => handler;
         public static Connection[] Connections => host.Connections;
-        public static byte ConnectedPlayers => (byte)Connections.Where(x => x.Connected).Count();
+        public static byte ConnectedPlayers {
+            get {
+                if (host != null) return (byte)Connections.Where(x => x != null).Count();
+                return 0;
+            }
+        }
 
         /// <summary>
         /// Initializes the Basically server.
         /// </summary>
-        /// <param name="channels">Channel limit for networking.</param>
-        public static void Initialize(int channels, HostCallbacks callbacks) {
+        /// <param name="callbacks">Host callbacks to use, can be null.</param>
+        public static void Initialize(HostCallbacks callbacks = null) {
             if (host != null) return;
 
-            host = new NetworkHost(channels, new ServerCallbacks());
-
-            AddReceiverClass(typeof(ServerReceivers));
+            handler = new MethodHandler(new ServerCallbacks());
+            handler.AddReceiverClass(typeof(ServerReceivers));
             originalCallbacks = callbacks;
+
+            host = new Transport(handler);
         }
 
         /// <summary>
@@ -64,15 +72,6 @@ namespace Basically.Server {
         }
 
         /// <summary>
-        /// Adds receivers from a class. All receivers must be public and static.
-        /// </summary>
-        /// <param name="type">Class where receivers are contained.</param>
-        public static void AddReceiverClass(Type type) {
-            if (host == null) return;
-            host.AddReceiverClass(type);
-        }
-
-        /// <summary>
         /// Broadcasts the message to every player.
         /// </summary>
         /// <typeparam name="T">Message type.</typeparam>
@@ -80,19 +79,7 @@ namespace Basically.Server {
         /// <param name="channel">Which channel to send the message through.</param>
         /// <param name="type">What type of message is this.</param>
         public static void Broadcast<T>(T message, byte channel, MessageType type) where T : struct, NetworkMessage {
-            if (ConnectedPlayers == 0) return;
-
-            var writer = Pool<Writer>.Pull();
-            Packer.Pack(message, writer);
-
-            var payload = writer.ToArray();
-            var flags = (Networking.ENet.PacketFlags)type;
-
-            foreach (var conn in host.Connections) {
-                if (!conn.Connected) continue;
-                conn.SendInternal(payload, channel, flags);
-            }
-            Pool<Writer>.Push(writer);
+            host.Broadcast(message, channel, type);
         }
 
         /// <summary>
@@ -104,19 +91,7 @@ namespace Basically.Server {
         /// <param name="type">What type of message is this.</param>
         /// <param name="excluding">Which player/connection to exclude.</param>
         public static void Broadcast<T>(T message, byte channel, MessageType type, Connection excluding) where T : struct, NetworkMessage {
-            if (ConnectedPlayers == 0) return;
-
-            var writer = Pool<Writer>.Pull();
-            Packer.Pack(message, writer);
-
-            var payload = writer.ToArray();
-            var flags = (Networking.ENet.PacketFlags)type;
-
-            foreach (var conn in host.Connections) {
-                if (conn == excluding) continue;
-                if (conn.Connected) conn.SendInternal(payload, channel, flags);
-            }
-            Pool<Writer>.Push(writer);
+            host.Broadcast(message, channel, type, excluding.ID);
         }
 
         /// <summary>
@@ -128,7 +103,7 @@ namespace Basically.Server {
         /// <param name="type">What type of message is this.</param>
         /// <param name="excluding">ID of player to exclude.</param>
         public static void Broadcast<T>(T message, byte channel, MessageType type, byte excluding) where T : struct, NetworkMessage {
-            Broadcast(message, channel, type, host.Connections[excluding]);
+            host.Broadcast(message, channel, type, excluding);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Basically.Client {
         }
 
         public override void OnReceive(Connection conn) {
-            Debug.Log("Message received.");
+            // Debug.Log("Message received.");
             NetworkClient.originalCallbacks?.OnReceive(conn);
         }
 

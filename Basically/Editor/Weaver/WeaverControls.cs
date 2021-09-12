@@ -10,6 +10,7 @@ namespace Basically.Editor.Weaver {
         public const string WEAVER_PAUSE = "BASIC_WEAVER_PAUSE";
         public const string WEAVER_TRY = "BASIC_WEAVER_TRY";
         public const string WEAVER_FAILED = "BASIC_WEAVER_FAIL";
+        public const string WEAVER_STARTUP = "BASIC_WEAVER_START";
 
         /// <summary>
         /// Used to prevent reloading of values.
@@ -54,12 +55,22 @@ namespace Basically.Editor.Weaver {
             }
         }
 
+        public static bool StartupWeave {
+            get {
+                return SessionState.GetBool(WEAVER_STARTUP, false);
+            }
+            set {
+                SessionState.SetBool(WEAVER_STARTUP, value);
+            }
+        }
+
         public static void Initialize() {
             if (Ready) return;
 
             Paused = false;
             TriedWeave = false;
             WeaveFailed = false;
+            StartupWeave = false;
             Ready = true;
         }
 

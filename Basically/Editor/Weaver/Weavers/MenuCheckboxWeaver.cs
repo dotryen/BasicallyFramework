@@ -35,7 +35,7 @@ namespace Basically.Editor.Weaver {
 
             // create shit
             foreach (var field in fields) {
-                if (HasAttribute<MenuCheckboxAttribute>(field, out CustomAttribute attr)) {
+                if (field.HasCustomAttribute<MenuCheckboxAttribute>(out var attr)) {
 
                     var name = (string)attr.ConstructorArguments[0].Value;
                     GeneratedCodeClass.Methods.Add(CreateButton(name, field));
@@ -44,7 +44,7 @@ namespace Basically.Editor.Weaver {
             }
 
             foreach (var property in properties) {
-                if (HasAttribute<MenuCheckboxAttribute>(property, out CustomAttribute attr)) {
+                if (property.HasCustomAttribute<MenuCheckboxAttribute>(out var attr)) {
 
                     var name = (string)attr.ConstructorArguments[0].Value;
                     GeneratedCodeClass.Methods.Add(CreateButton(name, property));

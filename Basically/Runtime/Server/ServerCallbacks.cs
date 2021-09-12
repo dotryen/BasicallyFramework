@@ -9,6 +9,7 @@ namespace Basically.Server {
 
     internal class ServerCallbacks : HostCallbacks {
         public override void OnConnect(Connection conn) {
+            NetworkUtility.Log($"Connection {conn.ID} successfully connected, sending ID");
             ServerTimers.Add(conn.ID, 10, () => {
                 conn.Disconnect();
                 NetworkUtility.Log("Handshake time limit reached.");

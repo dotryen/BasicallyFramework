@@ -7,8 +7,9 @@ namespace Basically.Client {
     using Networking;
 
     public static class NetworkClient {
-        private static NetworkHost host;
+        private static Transport host;
         internal static HostCallbacks originalCallbacks;
+        internal static MethodHandler handler;
 
         public static Connection Connection {
             get {
@@ -24,26 +25,22 @@ namespace Basically.Client {
             }
         }
 
+        public static MethodHandler Handler => handler;
+
         public static byte ID { get; internal set; }
 
         /// <summary>
         /// Initializes the Basically client.
         /// </summary>
-        /// <param name="channels">Channel limit for networking.</param>
-        public static void Initialize(int channels = 0xFF) {
+        /// <param name="callbacks">Host callbacks to use, can be null.</param>
+        public static void Initialize(HostCallbacks callbacks = null) {
             if (host != null) return;
-            host = new NetworkHost(channels, new ClientCallbacks());
-            originalCallbacks = null;
 
-            AddReceiverClass(typeof(ClientReceivers));
-        }
-
-        public static void Initialize(HostCallbacks callbacks, int channels = 0xFF) {
-            if (host != null) return;
-            host = new NetworkHost(channels, new ClientCallbacks());
+            handler = new MethodHandler(new ClientCallbacks());
+            handler.AddReceiverClass(typeof(ClientReceivers));
             originalCallbacks = callbacks;
 
-            AddReceiverClass(typeof(ClientReceivers));
+            host = new Transport(handler);
         }
 
         /// <summary>
@@ -90,15 +87,6 @@ namespace Basically.Client {
         public static void Send<T>(T message, byte channel, MessageType type) where T : struct, NetworkMessage {
             if (Connection == null) return;
             Connection.Send(message, channel, type);
-        }
-
-        /// <summary>
-        /// Adds receivers from a class. All receivers must be public and static.
-        /// </summary>
-        /// <param name="type">Class where receivers are contained.</param>
-        public static void AddReceiverClass(Type type) {
-            if (host == null) return;
-            host.AddReceiverClass(type);
         }
     }
 }

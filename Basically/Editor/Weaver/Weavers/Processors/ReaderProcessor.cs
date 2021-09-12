@@ -315,10 +315,10 @@ namespace Basically.Editor.Weaver {
         /// </summary>
         /// <param name="worker"></param>
         internal void InitializeReaders(ILProcessor worker) {
-            TypeReference genericReaderClassRef = mainModule.ImportReference(typeof(Reader<>));
+            TypeReference genericReaderClassRef = mainModule.ImportReference(typeof(TypeData<>));
 
             { // bit pass
-                System.Reflection.FieldInfo fieldInfo = typeof(Reader<>).GetField(nameof(Reader<object>.readBit));
+                System.Reflection.FieldInfo fieldInfo = typeof(TypeData<>).GetField(nameof(TypeData<object>.readBit));
                 FieldReference fieldRef = mainModule.ImportReference(fieldInfo);
                 TypeReference readerRef = mainModule.ImportReference(typeof(Reader));
                 TypeReference intRef = mainModule.ImportReference(typeof(int));
@@ -344,7 +344,7 @@ namespace Basically.Editor.Weaver {
             }
 
             { // regular pass
-                System.Reflection.FieldInfo fieldInfo = typeof(Reader<>).GetField(nameof(Reader<object>.read));
+                System.Reflection.FieldInfo fieldInfo = typeof(TypeData<>).GetField(nameof(TypeData<object>.read));
                 FieldReference fieldRef = mainModule.ImportReference(fieldInfo);
                 TypeReference networkReaderRef = mainModule.ImportReference(typeof(Reader));
                 TypeReference funcRef = mainModule.ImportReference(typeof(Func<,>));

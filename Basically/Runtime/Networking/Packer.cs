@@ -55,13 +55,4 @@ namespace Basically.Networking {
             };
         }
     }
-
-    public class DeltaKey {
-        readonly ushort key;
-        public ushort Key => key;
-
-        internal DeltaKey(ushort key) {
-            this.key = key;
-        }
-    }
 }
