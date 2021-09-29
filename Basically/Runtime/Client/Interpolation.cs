@@ -10,94 +10,106 @@ namespace Basically.Client {
 
     public static class Interpolation {
         internal struct InterpState {
-            public float time;
+            public float localTimestamp;
+            public float RemoteTimestamp => world.TickMS;
             public WorldSnapshot world;
 
             public InterpState(float time, WorldSnapshot snap) {
-                this.time = time;
+                this.localTimestamp = time;
                 world = snap;
             }
         }
 
-        static List<InterpState> buffer;
-
-        // STATE
-        static bool playing;
-        static bool initialized;
+        static SortedList<uint, InterpState> buffer;
 
         // TIME
-        static float time;
-        static float mark = 0f;
+        static float interpTime;
         
         // RECORDS
-        static InterpState lastState;
         static uint lastTick;
 
         internal static void Initialize() {
-            buffer = new List<InterpState>();
-
-            playing = false;
-            initialized = false;
-
-            time = 0;
-            mark = 0;
-
-            lastState = default;
+            buffer = new SortedList<uint, InterpState>();
+            interpTime = 0;
             lastTick = 0;
         }
 
         internal static void AddState(WorldSnapshot snap) {
-            if (snap.tick <= lastTick) return;
-            buffer.Add(new InterpState(time, snap));
+            if (buffer.Count > 64) return; // piss off
+            if (buffer.Count == 1 && snap.TickMS <= buffer.Values[0].RemoteTimestamp) return;
+            if (buffer.Count >= 2 && snap.TickMS <= buffer.Values[1].RemoteTimestamp) return;
+            if (buffer.ContainsKey(snap.tick)) return;
+
+            buffer.Add(snap.tick, new InterpState(Time.time, snap));
             lastTick = snap.tick;
         }
 
-        public static void Update(float delta) {
-            if (!playing) {
-                if (buffer.Count > 0 && !initialized) {
-                    lastState = buffer[0];
-                    initialized = true;
-                    buffer.RemoveAt(0);
-                }
+        public static void Update(float deltaTime) {
+            float threshold = Time.time - NetworkTiming.TICK;
+            if (!HasAmountOlderThan(threshold, 2)) return;
 
-                if (buffer.Count > 0 && initialized) {
-                    playing = true;
-                }
-            } else {
-                while (buffer.Count > 0 && mark > buffer[0].time) {
-                    lastState = buffer[0];
-                    buffer.RemoveAt(0);
-                }
+            float catchup = CalculateCatchup(4, 0.10f);
+            deltaTime *= 1 + catchup;
 
-                if (buffer.Count > 0) {
-                    if (buffer[0].time > 0) {
-                        var alpha = (mark - lastState.time) / (buffer[0].time - lastState.time);
+            interpTime += deltaTime;
 
-                        for (int i = 0; i < lastState.world.ids.Length; i++) {
-                            var ent = EntityManager.entities[lastState.world.ids[i]];
-                            ent.Interpolate(lastState.world.states[i], buffer[0].world.states[i], alpha);
-                        }
-                    }
-                }
+            GetFirstSecondAndDelta(out var first, out var second, out float alpha);
 
-                mark += delta;
+            while (interpTime >= alpha && HasAmountOlderThan(threshold, 3)) {
+                interpTime -= alpha;
+                buffer.RemoveAt(0);
+                GetFirstSecondAndDelta(out first, out second, out alpha);
             }
 
-            time += delta;
+            float t = Mathf.InverseLerp(first.RemoteTimestamp, second.RemoteTimestamp, first.RemoteTimestamp + interpTime);
+
+            for (int i = 0; i < EntityManager.entities.Length; i++) {
+                EntityManager.entities[i].Interpolate(first.world.states[i], second.world.states[i], t);
+            }
+
+            if (!HasAmountOlderThan(threshold, 3)) {
+                interpTime = Mathf.Min(interpTime, alpha);
+            }
         }
 
-        private static void Snap(InterpState state) {
-            for (int i = 0; i < state.world.ids.Length; i++) {
-                var id = state.world.ids[i];
+        private static void Snap(WorldSnapshot state) {
+            for (int i = 0; i < state.ids.Length; i++) {
+                var id = state.ids[i];
                 var ent = EntityManager.entities[id];
 
-                ent.transform.position = state.world.states[id].position;
-                ent.transform.rotation = state.world.states[id].rotation;
+                ent.transform.position = state.states[id].position;
+                ent.transform.rotation = state.states[id].rotation;
             }
         }
 
+        #region Helpers
+
+        static bool HasAmountOlderThan(float threshold, int amount) {
+            return buffer.Count >= amount && buffer.Values[amount - 1].localTimestamp <= threshold;
+        }
+
+        static float CalculateCatchup(int catchupThreshold, float catchupMultiplier)  {
+            // NOTE: we count ALL buffer entires > threshold as excess.
+            //       not just the 'old enough' ones.
+            //       if buffer keeps growing, we have to catch up no matter what.
+            int excess = buffer.Count - catchupThreshold;
+            return excess > 0 ? excess * catchupMultiplier : 0;
+        }
+
+        static void GetFirstSecondAndDelta(out InterpState first, out InterpState second, out float delta) {
+            // get first & second
+            first = buffer.Values[0];
+            second = buffer.Values[1];
+
+            // delta between first & second is needed a lot
+            // USES REMOTE SO TICKS
+            delta = second.world.TickMS - first.world.TickMS;
+        }
+
+        #endregion
+
         public static void InterpolationGUI() {
-            GUILayout.Box($"Interpolation:\nStates: {buffer.Count}\nMark: {mark}\nTime: {time}");
+            GUILayout.Box($"Interpolation:\nStates: {buffer.Count}\nTime: {interpTime}");
             // GUILayout.Label($"Interpolation: {buffer.Count} states");
             // GUILayout.Label($"    Mark: {mark}");
             // GUILayout.Label($"    Time: {time}");

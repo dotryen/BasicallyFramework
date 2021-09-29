@@ -45,6 +45,7 @@ namespace Basically.Client {
 
         /// <summary>
         /// Deinitializes the Basically client.
+        /// Disconnecting the client automatically deinitializes.
         /// </summary>
         public static void Deinitialize() {
             host = null;

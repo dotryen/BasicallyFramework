@@ -15,7 +15,7 @@ namespace Basically.Editor {
         public static bool Setup { get; private set; } = false;
 
         public static bool client;
-        [MenuCheckbox("Basically/DefineTest/ClientFake")]
+        // [MenuCheckbox("Basically/DefineTest/ClientFake")]
         public static bool ClientFake {
             get {
                 return client;
@@ -27,7 +27,7 @@ namespace Basically.Editor {
             }
         }
 
-        [InitializeOnLoadMethod]
+        // [InitializeOnLoadMethod]
         static void OnLoad() {
             if (!File.Exists(FILE_PATH)) {
                 File.Create(FILE_PATH);

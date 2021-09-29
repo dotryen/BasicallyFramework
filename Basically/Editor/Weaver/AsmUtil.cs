@@ -21,6 +21,16 @@ namespace Basically.Editor.Weaver {
             return assemblies.Where(x => x.flags == (AssemblyFlags)platform).ToArray();
         }
 
+        public static UAssembly GetAssemblyByName(string name) {
+            var assemblies = CompilationPipeline.GetAssemblies();
+            return assemblies.FirstOrDefault(x => x.name == name);
+        }
+
+        public static UAssembly GetAssemblyByPath(string path) {
+            var assemblies = CompilationPipeline.GetAssemblies();
+            return assemblies.FirstOrDefault(x => x.outputPath == path);
+        }
+
         /// <summary>
         /// Finds the Basically assembly in Unity form.
         /// </summary>

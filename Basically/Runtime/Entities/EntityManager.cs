@@ -26,6 +26,10 @@ namespace Basically.Entities {
             entities[entity.ID] = entity;
         }
 
+        public static void CreateEntity(string name) {
+
+        }
+
 #if BASICALLY_SERVER
 
         public static void ServerStart() {
@@ -57,11 +61,5 @@ namespace Basically.Entities {
         }
 
 #endif
-    }
-
-    public struct EntityState {
-        public Vector3 position;
-        public Quaternion rotation;
-        public Parameters parameters;
     }
 }

@@ -35,9 +35,7 @@ namespace Basically.Client {
         }
 
         void Reset() {
-            NetworkClient.Connection.Status = ConnectionStatus.NotConnected;
-            Host.Stop();
-            Debug.Log("Reset called");
+            NetworkClient.Deinitialize();
         }
     }
 }

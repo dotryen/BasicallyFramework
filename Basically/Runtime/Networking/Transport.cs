@@ -66,6 +66,7 @@ namespace Basically.Networking {
         ~Transport() {
             Pool<Reader>.Dispose(readerKey);
             Pool<Writer>.Dispose(writerKey);
+            NetworkUtility.Deinitialize();
         }
 
         /// <summary>
@@ -256,7 +257,6 @@ namespace Basically.Networking {
                     }
 
                     case EventType.Receive: {
-                        NetworkUtility.Log($"New packet received from peer {netEvent.Peer.ID}");
                         if (netEvent.Packet.Length > MAXIMUM_SIZE) {
                             NetworkUtility.LogError("Packet received is too large for readers inside pool.");
                             // no backup, for now at least

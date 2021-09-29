@@ -1,6 +1,6 @@
 ﻿using System;
-using emotitron.Compression;
-using emotitron.Compression.Utilities;
+using Basically.Serialization.Bit;
+using Basically.Serialization.Bit.Utilities;
 using UnityEngine;
 
 namespace Basically.Serialization {
@@ -121,20 +121,17 @@ namespace Basically.Serialization {
                 }
             }
         }
-        public static void WriteParameters(this Writer writer, Parameters value) {
-            if (value.Count == 0) {
-                writer.WriteBool(false);
-            } else {
-                writer.WriteBool(true);
-                writer.WriteByte(value.Count);
-                for (int i = 0; i < value.Count; i++) {
-                    writer.WriteInt(value.keys[i]);
-                    writer.WriteArray(value.valuesBytes[i]);
-                }
-            }
-        }
         public static void WriteString(this Writer writer, string value) {
             writer.WriteArray(System.Text.Encoding.UTF8.GetBytes(value));
+        }
+        public static void WriteParameters(this Writer writer, IParameters parameters) {
+            var casted = (SerParameters)parameters; // Parameters should never be transferred, only SerParameters
+
+            writer.WriteByte(casted.index);
+            for (int i = 0; i < casted.index; i++) {
+                writer.WriteInt(casted.keys[i]);
+                writer.WriteArray(casted.values[i]);
+            }
         }
     }
 }

@@ -12,16 +12,16 @@ namespace Basically.Editor.Weaver {
         public override int Priority => 0;
         public override bool IsEditor => false;
 
-        System.Reflection.MethodInfo addReceiverInfo;
+        // System.Reflection.MethodInfo addReceiverInfo;
+        MethodReference addReceiverInfo;
 
         public override void Weave() {
-            addReceiverInfo = typeof(MethodHandler).GetMethod(nameof(MethodHandler.AddReceiver));
+            addReceiverInfo = Module.ImportReference(typeof(MethodHandler).GetMethod(nameof(MethodHandler.AddReceiver)));
 
             foreach (var type in Module.Types.Where(x => x.IsSealed && x.IsAbstract)) {
                 if (!type.HasCustomAttribute<ReceiverClassAttribute>(out var attr)) continue;
 
-                var sysType = type.GetSystemType();
-                var init = CreateInitMethod(type);
+                var init = CreateInitMethod();
                 var worker = init.Body.GetILProcessor();
 
                 foreach (var method in type.Methods.Where(x => x.IsPublic && x.IsStatic && x.Parameters.Count == 2)) {
@@ -29,7 +29,7 @@ namespace Basically.Editor.Weaver {
                     if (!method.Parameters[1].ParameterType.Implements<NetworkMessage>()) continue;
 
                     var noAuth = method.HasCustomAttribute<NoAuthAttribute>();
-                    AddReceiver(worker, method, sysType.GetMethod(method.Name).GetParameters()[1].ParameterType, noAuth);
+                    AddReceiver(worker, method, noAuth);
                 }
 
                 worker.Emit(OpCodes.Ret);
@@ -38,17 +38,17 @@ namespace Basically.Editor.Weaver {
             }
         }
 
-        MethodDefinition CreateInitMethod(TypeDefinition type) {
+        MethodDefinition CreateInitMethod() {
             const MethodAttributes ATTRIBUTES = MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig;
             var method = new MethodDefinition("_Init", ATTRIBUTES, Module.ImportReference(typeof(void)));
 
-            method.Parameters.Add(new ParameterDefinition("host", ParameterAttributes.None, Module.ImportReference(typeof(MethodHandler))));
+            method.Parameters.Add(new ParameterDefinition("handler", ParameterAttributes.None, Module.ImportReference(typeof(MethodHandler))));
             method.Body.InitLocals = true;
 
             return method;
         }
 
-        void AddReceiver(ILProcessor worker, MethodDefinition method, Type parameter, bool noAuth) {
+        void AddReceiver(ILProcessor worker, MethodDefinition method, bool noAuth) {
             var actionRef = Module.ImportReference(typeof(Action<,>));
             var actionCtorRef = Module.ImportReference(typeof(Action<,>).GetConstructors()[0]);
             var connRef = Module.ImportReference(typeof(Connection));
@@ -64,7 +64,7 @@ namespace Basically.Editor.Weaver {
 
             // add to receiver
             worker.Emit(noAuth ? OpCodes.Ldc_I4_0 : OpCodes.Ldc_I4_1);
-            var add = Module.ImportReference(addReceiverInfo.MakeGenericMethod(parameter));
+            var add = Module.ImportReference(addReceiverInfo.MakeGenericMethod(messageRef));
             worker.Emit(OpCodes.Callvirt, add);
 
             worker.Emit(OpCodes.Nop);

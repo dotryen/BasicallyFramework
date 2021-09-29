@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   setup: 1
   client: 1
-  server: 0
+  server: 1
   entities: 1
   mappacks: 1

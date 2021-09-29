@@ -28,7 +28,12 @@ namespace Basically.Frameworks {
         }
 
         internal override void SimulatePostPhys() {
-            if (GameHistory.SnapshotReady) NetworkServer.Broadcast(GameHistory.LatestRecord, 0, MessageType.Unreliable);
+            if (GameHistory.SnapshotReady) {
+                var record = GameHistory.LatestRecord;
+                if (record.tick != tick) print($"tick mismatch {tick - record.tick}");
+
+                NetworkServer.Broadcast(GameHistory.LatestRecord, 0, MessageType.Unreliable);
+            }
         }
 
         internal override void SimulatePrePhys() {

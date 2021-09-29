@@ -1,13 +1,13 @@
 {
   "dependencies": {
     "com.riles.assets": {
-      "version": "file:D:/Users/riles/Desktop/Unity Projects/PhysicsNetworking/Assets",
+      "version": "file:../../Assets",
       "depth": 0,
       "source": "local",
       "dependencies": {}
     },
     "com.riles.basically": {
-      "version": "file:D:/Users/riles/Desktop/Unity Projects/PhysicsNetworking/Basically",
+      "version": "file:../../Basically",
       "depth": 0,
       "source": "local",
       "dependencies": {
@@ -15,7 +15,7 @@
       }
     },
     "com.riles.basically.public": {
-      "version": "file:D:/Users/riles/Desktop/Unity Projects/PhysicsNetworking/Basically.Public",
+      "version": "file:../../Basically.Public",
       "depth": 0,
       "source": "local",
       "dependencies": {}

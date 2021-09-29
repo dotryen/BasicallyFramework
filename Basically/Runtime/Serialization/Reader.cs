@@ -1,6 +1,6 @@
 ﻿using System;
-using emotitron.Compression;
-using emotitron.Compression.Utilities;
+using Basically.Serialization.Bit;
+using Basically.Serialization.Bit.Utilities;
 using UnityEngine;
 
 namespace Basically.Serialization {
@@ -107,21 +107,17 @@ namespace Basically.Serialization {
             }
             return arr;
         }
-        public static Parameters ReadParemeters(this Reader reader) {
-            if (!reader.ReadBool()) return default;
-
-            byte length = reader.ReadByte();
-            var param = new Parameters(length);
-
-            for (int i = 0; i < length; i++) {
-                param.keys[i] = reader.ReadInt();
-                param.valuesBytes[i] = reader.ReadArray<byte>();
-            }
-
-            return param;
-        }
         public static string ReadString(this Reader reader) {
             return System.Text.Encoding.UTF8.GetString(reader.ReadArray<byte>());
+        }
+        public static IParameters ReadParameters(this Reader reader) {
+            var casted = new SerParameters(reader.ReadByte()); // Parameters should never be transferred, only SerParameters
+
+            for (int i = 0; i < casted.Count; i++) {
+                casted.keys[i] = reader.ReadInt();
+                casted.values[i] = reader.ReadArray<byte>();
+            }
+            return casted;
         }
     }
 }

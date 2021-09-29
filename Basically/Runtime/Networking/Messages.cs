@@ -20,6 +20,8 @@ namespace Basically.Networking {
         public uint tick;
         public ushort[] ids;
         public EntityState[] states;
+
+        public float TickMS => tick * NetworkTiming.TICK;
     }
 
     internal struct DeltaConfirm : NetworkMessage {

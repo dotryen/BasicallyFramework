@@ -142,9 +142,15 @@ namespace Basically.Editor.Weaver {
             }
         }
 
-        public static Type GetSystemType(this TypeReference tr) {
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.Load(tr.Module.Assembly.FullName);
-            return assembly.GetType(tr.FullName);
+        public static MethodReference MakeGenericMethod(this MethodReference self, params TypeReference[] arguments) {
+            if (self.GenericParameters.Count != arguments.Length)
+                throw new ArgumentException();
+
+            var instance = new GenericInstanceMethod(self);
+            foreach (var argument in arguments)
+                instance.GenericArguments.Add(argument);
+
+            return instance;
         }
     }
 }

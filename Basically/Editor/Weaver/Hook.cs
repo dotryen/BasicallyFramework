@@ -41,7 +41,7 @@ namespace Basically.Editor.Weaver {
                 WeaverControls.StartupWeave = true;
             }
 
-            Debug.Log("Weaver callbacks successfully added.");
+            // Debug.Log("Weaver callbacks successfully added.");
         }
 
         public static void WeaveExistingAssemblies() {
@@ -69,7 +69,13 @@ namespace Basically.Editor.Weaver {
 
         internal static void OnAssemblyCompile(string assemblyPath, CompilerMessage[] messages) {
             if (!File.Exists(assemblyPath)) return;
-            if (!File.Exists(AsmUtil.GetBasicallyAssembly(Platform.Player).outputPath)) return;
+
+            var name = Path.GetFileNameWithoutExtension(assemblyPath);
+            if (name != RUNTIME_DLL && name != EDITOR_DLL) {
+                var unityAsm = AsmUtil.GetAssemblyByPath(assemblyPath);
+                var result = unityAsm.assemblyReferences.Any(x => x.name == RUNTIME_DLL);
+                if (!result) return;
+            }
 
             bool isEditor = false;
 

@@ -22,7 +22,7 @@ namespace Basically.Server {
         static bool rewinding;
 
         // Public Properties
-        public static WorldSnapshot LatestRecord => buffer[BufferSlot];
+        public static WorldSnapshot LatestRecord => buffer[Wrap(slot - 1)];
         public static bool SnapshotReady => statesSkipped == 1;
         public static bool Rewinding => rewinding;
 
@@ -57,11 +57,14 @@ namespace Basically.Server {
 
             for (int i = 0; i < count; i++) {
                 var ent = EntityManager.entities[i];
+                IParameters param = new SerParameters(0);
+                ent.Serialize(ref param);
+
                 snap.ids[i] = ent.ID;
                 snap.states[i] = new EntityState {
                     position = ent.Position,
                     rotation = ent.Rotation,
-                    parameters = ent.Serialize()
+                    parameters = param
                 };
             }
 

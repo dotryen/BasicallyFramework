@@ -100,19 +100,6 @@ namespace Basically.Editor.Weaver {
             playerWeavers.Clear();
         }
 
-        private static Weaver[] GetAllWeavers(bool editor) {
-            var assemblies = new List<UAssembly>();
-            assemblies.AddRange(AsmUtil.GetAssembliesWithReference(Platform.Editor));
-            assemblies.Add(AsmUtil.GetBasicallyAssembly(Platform.Editor));
-
-            var weavers = new List<Weaver>();
-            foreach (var asm in assemblies) {
-                weavers.AddRange(asm.LoadAssembly(false).GetAllDescendantsOf(typeof(Weaver)).Select(x => (Weaver)Activator.CreateInstance(x)));
-            }
-
-            return weavers.Where(x => x.IsEditor == editor).OrderBy(y => y.Priority).ToArray();
-        }
-
         private static string UnityEngineDLLDirectory() {
             return Path.GetDirectoryName(EditorApplication.applicationPath) + @"\Data\Managed";
         }
