@@ -2,6 +2,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Basically.Server {
@@ -11,7 +12,7 @@ namespace Basically.Server {
     using Utility;
 
     internal static class GameHistory {
-        const int SIZE = NetworkTiming.SNAPSHOTS_PER_SECOND;
+        const int SIZE = BGlobals.SNAPSHOTS_PER_SECOND;
 
         static WorldSnapshot[] buffer; // ring buffer
         static WorldSnapshot rewindCache;
@@ -28,7 +29,7 @@ namespace Basically.Server {
 
         // Utility
         static uint BufferSlot => Wrap(slot);
-        static uint Tick => Framework.Instance.Tick;
+        static uint Tick => BGlobals.Tick;
 
         public static void Initialize() {
             buffer = new WorldSnapshot[SIZE];
@@ -38,7 +39,7 @@ namespace Basically.Server {
         }
 
         public static void OnTick() {
-            if (statesSkipped == NetworkTiming.STATE_TICKS_SKIPPED) {
+            if (statesSkipped == BGlobals.STATE_TICKS_SKIPPED) {
                 Add(Record());
                 statesSkipped = 1;
             } else {
@@ -47,7 +48,7 @@ namespace Basically.Server {
         }
 
         public static WorldSnapshot Record() {
-            var count = EntityManager.entities.Length;
+            var count = EntityManager.Entities.Count;
 
             WorldSnapshot snap = new WorldSnapshot() {
                 tick = Tick,
@@ -55,15 +56,15 @@ namespace Basically.Server {
                 states = new EntityState[count]
             };
 
-            for (int i = 0; i < count; i++) {
-                var ent = EntityManager.entities[i];
+            for (ushort i = 0; i < count; i++) {
+                var pair = EntityManager.Entities.ElementAt(i);
                 IParameters param = new SerParameters(0);
-                ent.Serialize(ref param);
+                pair.Value.Serialize(ref param);
 
-                snap.ids[i] = ent.ID;
+                snap.ids[i] = pair.Key;
                 snap.states[i] = new EntityState {
-                    position = ent.Position,
-                    rotation = ent.Rotation,
+                    position = pair.Value.Position,
+                    rotation = pair.Value.Rotation,
                     parameters = param
                 };
             }
@@ -78,16 +79,16 @@ namespace Basically.Server {
         public static void Rewind(uint ms) {
             rewindCache = Record();
 
-            int lag = Mathf.FloorToInt(ms / NetworkTiming.SNAPSHOT_INTERVAL);
-            float interp = Mathf.InverseLerp(0, NetworkTiming.TICK, ms - (lag * NetworkTiming.SNAPSHOT_INTERVAL));
+            int lag = Mathf.FloorToInt(ms / BGlobals.SNAPSHOT_INTERVAL);
+            float interp = Mathf.InverseLerp(0, BGlobals.TICK, ms - (lag * BGlobals.SNAPSHOT_INTERVAL));
 
             uint pos = slot - (uint)lag;
 
             var from = buffer[Wrap(pos)];
             var to = pos == slot ? rewindCache : buffer[Wrap(pos + 1)];
 
-            for (ushort i = 0; i < to.ids.Length; i++) {
-                EntityManager.entities[to.ids[i]].Interpolate(from.states[i], to.states[i], interp);
+            foreach (var ent in EntityManager.Entities.Values) {
+                ent.Interpolate(from.states[ent.ID], to.states[ent.ID], interp);
             }
 
             rewinding = true;
@@ -100,9 +101,8 @@ namespace Basically.Server {
             if (!rewinding) return;
 
             // TODO: Add resimulation
-            for (ushort i = 0; i < EntityManager.entities.Length; i++) {
-                var ent = EntityManager.entities[i];
-                var state = rewindCache.states[i];
+            foreach (var ent in EntityManager.Entities.Values) {
+                var state = rewindCache.states[ent.ID];
                 ent.transform.SetPositionAndRotation(state.position, state.rotation);
             }
 

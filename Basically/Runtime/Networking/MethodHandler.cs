@@ -10,10 +10,14 @@ namespace Basically.Networking {
 
     public class MethodHandler {
         private readonly Dictionary<ushort, MessageDelegate> handlers;
-        private HostCallbacks callbacks;
+        private readonly HostCallbacks callbacks;
+        private readonly ThreadTasks tasks;
+
+        public ThreadTasks Tasks => tasks;
 
         public MethodHandler() {
             handlers = new Dictionary<ushort, MessageDelegate>();
+            tasks = new ThreadTasks();
         }
 
         public MethodHandler(HostCallbacks callbacks) : this() {
@@ -21,24 +25,24 @@ namespace Basically.Networking {
         }
 
         internal void OnConnect(Connection connection) {
-            ThreadData.AddUnity(() => {
+            tasks.Add(() => {
                 callbacks?.OnConnect(connection);
             });
         }
 
         internal void OnDisconnect(Connection connection, uint data) {
-            ThreadData.AddUnity(() => {
+            tasks.Add(() => {
                 callbacks?.OnDisconnect(connection, data);
             });
         }
 
         internal void OnTimeout(Connection connection) {
-            ThreadData.AddUnity(() => { callbacks?.OnTimeout(connection); });
+            tasks.Add(() => { callbacks?.OnTimeout(connection); });
         }
 
         internal bool OnReceive(Connection connection, Reader reader, ushort header) {
             if (handlers.TryGetValue(header, out var del)) {
-                ThreadData.AddUnity(() => {
+                tasks.Add(() => {
                     callbacks?.OnReceive(connection);
                     del(connection, reader);
                     Pool<Reader>.Push(reader);
@@ -59,7 +63,7 @@ namespace Basically.Networking {
 
             var method = type.GetMethod("_Init", BindingFlags.Public | BindingFlags.Static);
             method.Invoke(null, new object[] { this });
-            // NetworkUtility.Log($"{type.FullName} initialized.");
+            // NetworkUtility.Log($"{type.FullName} initialized."); // causes exception
         }
     }
 }

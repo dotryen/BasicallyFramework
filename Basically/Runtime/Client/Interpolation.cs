@@ -17,21 +17,21 @@ namespace Basically.Client {
             public InterpState(float time, WorldSnapshot snap) {
                 this.localTimestamp = time;
                 world = snap;
+                for (int i = 0; i < snap.ids.Length; i++) {
+                    world.states[i].Tick = snap.tick;
+                }
             }
         }
 
         static SortedList<uint, InterpState> buffer;
-
-        // TIME
+        static SortedList<ushort, PredictableEntity> predictSort;
         static float interpTime;
-        
-        // RECORDS
-        static uint lastTick;
+
+        internal static SortedList<uint, InterpState> Buffer => buffer;
 
         internal static void Initialize() {
             buffer = new SortedList<uint, InterpState>();
             interpTime = 0;
-            lastTick = 0;
         }
 
         internal static void AddState(WorldSnapshot snap) {
@@ -41,11 +41,10 @@ namespace Basically.Client {
             if (buffer.ContainsKey(snap.tick)) return;
 
             buffer.Add(snap.tick, new InterpState(Time.time, snap));
-            lastTick = snap.tick;
         }
 
         public static void Update(float deltaTime) {
-            float threshold = Time.time - NetworkTiming.TICK;
+            float threshold = Time.time - BGlobals.TICK;
             if (!HasAmountOlderThan(threshold, 2)) return;
 
             float catchup = CalculateCatchup(4, 0.10f);
@@ -53,32 +52,22 @@ namespace Basically.Client {
 
             interpTime += deltaTime;
 
-            GetFirstSecondAndDelta(out var first, out var second, out float alpha);
+            GetFirstSecondAndDelta(out var from, out var to, out float alpha);
 
             while (interpTime >= alpha && HasAmountOlderThan(threshold, 3)) {
                 interpTime -= alpha;
                 buffer.RemoveAt(0);
-                GetFirstSecondAndDelta(out first, out second, out alpha);
+                GetFirstSecondAndDelta(out from, out to, out alpha);
             }
 
-            float t = Mathf.InverseLerp(first.RemoteTimestamp, second.RemoteTimestamp, first.RemoteTimestamp + interpTime);
+            float t = Mathf.InverseLerp(from.RemoteTimestamp, to.RemoteTimestamp, from.RemoteTimestamp + interpTime);
 
-            for (int i = 0; i < EntityManager.entities.Length; i++) {
-                EntityManager.entities[i].Interpolate(first.world.states[i], second.world.states[i], t);
+            foreach (var ent in EntityManager.Entities.Values) {
+                ent.Interpolate(from.world.states[ent.ID], to.world.states[ent.ID], t);
             }
 
             if (!HasAmountOlderThan(threshold, 3)) {
                 interpTime = Mathf.Min(interpTime, alpha);
-            }
-        }
-
-        private static void Snap(WorldSnapshot state) {
-            for (int i = 0; i < state.ids.Length; i++) {
-                var id = state.ids[i];
-                var ent = EntityManager.entities[id];
-
-                ent.transform.position = state.states[id].position;
-                ent.transform.rotation = state.states[id].rotation;
             }
         }
 
@@ -107,13 +96,6 @@ namespace Basically.Client {
         }
 
         #endregion
-
-        public static void InterpolationGUI() {
-            GUILayout.Box($"Interpolation:\nStates: {buffer.Count}\nTime: {interpTime}");
-            // GUILayout.Label($"Interpolation: {buffer.Count} states");
-            // GUILayout.Label($"    Mark: {mark}");
-            // GUILayout.Label($"    Time: {time}");
-        }
     }
 }
 

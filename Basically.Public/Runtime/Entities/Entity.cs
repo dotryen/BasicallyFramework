@@ -4,17 +4,31 @@ using UnityEngine;
 using Basically.Utility;
 
 namespace Basically.Entities {
-    
-
     /// <summary>
-    /// In-Game objects that synced from the server and interpolated.
+    /// In-game objects that synced from the server and interpolated.
     /// </summary>
     [AddComponentMenu("Basically/Entities/Entity")]
     public class Entity : MonoBehaviour {
         public ushort ID { get; internal set; }
 
-        public virtual Vector3 Position => transform.position;
-        public virtual Quaternion Rotation => transform.rotation;
+        public virtual Vector3 Position {
+            get {
+                return transform.position;
+            }
+
+            set {
+                transform.position = value;
+            }
+        }
+        public virtual Quaternion Rotation {
+            get {
+                return transform.rotation;
+            }
+
+            set {
+                transform.rotation = value;
+            }
+        }
         
         #region Server
 
@@ -74,13 +88,41 @@ namespace Basically.Entities {
             
         }
 
-        protected internal virtual void Deserialize() {
+        /// <summary>
+        /// The opposite of serializing.
+        /// </summary>
+        /// <param name="parameters">Parameters with the entities data.</param>
+        protected internal virtual void Deserialize(IParameters parameters) {
 
         }
 
+        /// <summary>
+        /// Interpolate between entity states.
+        /// </summary>
+        /// <param name="from">State to interpolate from.</param>
+        /// <param name="to">State to interpolate to.</param>
+        /// <param name="interpAmount">Interpolation amount.</param>
         protected internal virtual void Interpolate(EntityState from, EntityState to, float interpAmount) {
             transform.SetPositionAndRotation(Vector3.LerpUnclamped(from.position, to.position, interpAmount), Quaternion.SlerpUnclamped(from.rotation, to.rotation, interpAmount));
             // Debug.DrawLine(from.position, to.position, Color.yellow);
         }
+
+        #region Weaver Methods
+
+        /// <summary>
+        /// DO NOT EDIT, THESE ARE GENERATED AT COMPILE TIME
+        /// </summary>
+        protected internal virtual void Weaver_GetNetVars(ref IParameters parameters) {
+
+        }
+
+        /// <summary>
+        /// DO NOT EDIT, THESE ARE GENERATED AT COMPILE TIME
+        /// </summary>
+        protected internal virtual void Weaver_SetNetVars(IParameters parameters) {
+
+        }
+
+        #endregion
     }
 }

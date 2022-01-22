@@ -19,15 +19,22 @@ namespace Basically.Networking {
         // THREADING
         private bool ready;
         private Thread networkThread;
+        private ThreadTasks inTasks;
 
         // POOL KEYS
         private object readerKey;
         private object writerKey;
 
+        private bool isClient;
+
         const int MAXIMUM_SIZE = 4 * 1024;
 
         public Connection[] Connections => connections;
-        public byte ConnectedPlayers { get {
+
+        /// <summary>
+        /// Number of authenticated connections
+        /// </summary>
+        public byte ConnectionCount { get {
                 return (byte)connections.Where((x) => {
                     if (x != null) {
                         if (x.Authenticated) return true;
@@ -48,6 +55,7 @@ namespace Basically.Networking {
             host = new Host();
             handler = new MethodHandler(new HostCallbacks());
             peerToConn = new Dictionary<uint, byte>();
+            inTasks = new ThreadTasks();
         }
 
         /// <summary>
@@ -61,6 +69,7 @@ namespace Basically.Networking {
             host = new Host();
             this.handler = handler;
             peerToConn = new Dictionary<uint, byte>();
+            inTasks = new ThreadTasks();
         }
 
         ~Transport() {
@@ -86,6 +95,8 @@ namespace Basically.Networking {
 
             host.Create(1, 0xFF);
             host.Connect(add);
+            isClient = true;
+
             StartThread();
         }
 
@@ -102,6 +113,8 @@ namespace Basically.Networking {
             connections = new Connection[maxPlayers];
 
             host.Create(add, maxPlayers);
+            isClient = false;
+
             StartThread();
         }
 
@@ -120,9 +133,9 @@ namespace Basically.Networking {
         /// <param name="channel">Which channel to send the message through.</param>
         /// <param name="type">What type of message is this.</param>
         public void Broadcast<T>(T message, byte channel, MessageType type) where T : struct, NetworkMessage {
-            if (ConnectedPlayers == 0) return;
+            if (ConnectionCount == 0) return;
 
-            ThreadData.AddNet(() => {
+            inTasks.Add(() => {
                 var writer = Pool<Writer>.Pull();
                 Packer.Pack(message, writer);
                 var payload = writer.ToArray();
@@ -146,9 +159,9 @@ namespace Basically.Networking {
         /// <param name="type">What type of message is this.</param>
         /// <param name="excluding">ID of connection to exclude.</param>
         public void Broadcast<T>(T message, byte channel, MessageType type, byte excluding) where T : struct, NetworkMessage {
-            if (ConnectedPlayers == 0) return;
+            if (ConnectionCount == 0) return;
 
-            ThreadData.AddNet(() => {
+            inTasks.Add(() => {
                 var writer = Pool<Writer>.Pull();
                 Packer.Pack(message, writer);
                 var payload = writer.ToArray();
@@ -190,9 +203,8 @@ namespace Basically.Networking {
             UnityEngine.Profiling.Profiler.BeginThreadProfiling("Basically", "Network");
 
             while (ready) {
-                ThreadData.ExecuteNet();
+                inTasks.Execute();
                 Update();
-                // NetworkUtility.Log("Host update ran"); // FUCK THIS LINE, IT LITERALLY FREEZES UNITY AND ATTEMPTS TO DESTROY MY COMPUTER
             }
 
             // disconnect everyone
@@ -223,7 +235,7 @@ namespace Basically.Networking {
                         break;
 
                     case EventType.Connect: {
-                        if (ConnectedPlayers == connections.Length || connections.Any(x => {
+                        if (ConnectionCount == connections.Length || connections.Any(x => {
                             if (x == null) return false;
                             return x.IP == netEvent.Peer.IP;
                         })) {
@@ -290,17 +302,18 @@ namespace Basically.Networking {
             return connections[peerToConn[peer.ID]];
         }
 
-        private void AddConnection(Connection connect) {
+        internal void AddConnection(Connection connect) {
             for (byte i = 0; i < connections.Length; i++) {
                 if (connections[i] == null) {
                     connections[i] = connect;
+                    connect.threadToQueue = inTasks;
                     connect.ID = i;
                     return;
                 }
             }
         }
 
-        private void RemoveConnection(byte id) {
+        internal void RemoveConnection(byte id) {
             if (id > connections.Length - 1) throw new ArgumentOutOfRangeException();
             connections[id] = null;
         }

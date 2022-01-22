@@ -6,22 +6,24 @@ using UnityEngine;
 
 namespace Basically.Client {
     using Networking;
+    using Frameworks;
 
     internal class ClientCallbacks : HostCallbacks {
         public override void OnConnect(Connection conn) {
-            NetworkClient.Connection.Status = ConnectionStatus.WaitingForHandshake;
+            conn.Status = ConnectionStatus.WaitingForHandshake;
+            NetworkClient.connection = conn;
             Debug.Log("Succesfully connected to server, awaiting ID.");
         }
 
         public override void OnDisconnect(Connection conn, uint data) {
-            Reset();
             NetworkClient.originalCallbacks?.OnDisconnect(conn, data);
+            ClientFramework.Instance.StopFramework();
             Debug.Log("Server ended our connection.");
         }
 
         public override void OnTimeout(Connection conn) {
-            Reset();
             NetworkClient.originalCallbacks?.OnTimeout(conn);
+            ClientFramework.Instance.StopFramework();
             Debug.Log("Server timed out.");
         }
 
@@ -32,10 +34,6 @@ namespace Basically.Client {
 
         public override void OnSend(Connection conn) {
             NetworkClient.originalCallbacks?.OnSend(conn);
-        }
-
-        void Reset() {
-            NetworkClient.Deinitialize();
         }
     }
 }

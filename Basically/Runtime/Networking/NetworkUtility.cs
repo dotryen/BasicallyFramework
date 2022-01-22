@@ -23,7 +23,7 @@ namespace Basically.Networking {
             initialized = false;
         }
 
-        public static int MSToTicks(float ms) => Mathf.FloorToInt(ms / (NetworkTiming.TICK * 1000f));
+        public static int MSToTicks(float ms) => Mathf.FloorToInt(ms / (Utility.BGlobals.TICK * 1000f));
 
         internal static void Log(object message) {
             ThreadData.AddUnity(() => {
@@ -41,6 +41,14 @@ namespace Basically.Networking {
             ThreadData.AddUnity(() => {
                 Debug.LogError("NETWORKING ERROR: " + message);
             });
+        }
+
+        internal static void LowPass(ref ulong? value, ulong bytes, ulong constant = 5) {
+            if (value == null) {
+                value = bytes;
+            } else {
+                value += (bytes - value.Value) / constant;
+            }
         }
     }
 }

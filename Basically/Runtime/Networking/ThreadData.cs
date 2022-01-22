@@ -12,6 +12,7 @@ namespace Basically.Networking {
     /// </summary>
     internal static class ThreadData {
         internal static ConcurrentQueue<Action> toExecuteUnity;
+        internal static ConcurrentQueue<Action> toExecuteClient;
         internal static ConcurrentQueue<Action> toExecuteNet;
 
         public static void Initialize() {

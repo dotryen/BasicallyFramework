@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Basically.Serialization {
+    using Utility;
+
     public static class QuatCompress {
         const float MIN_RANGE = -0.707107f;
         const float MAX_RANGE = 0.707107f;
@@ -40,15 +42,15 @@ namespace Basically.Serialization {
             // If negative, negate the vector. (x, y, z, w) == (-x, -y, -z, -w)
             if (value[index] < 0) withoutLargest = -withoutLargest;
 
-            aScaled = ScaleFloatToUShort(withoutLargest.x, MIN_RANGE, MAX_RANGE, 0, NINE_BIT_MAX);
-            bScaled = ScaleFloatToUShort(withoutLargest.y, MIN_RANGE, MAX_RANGE, 0, NINE_BIT_MAX);
-            cScaled = ScaleFloatToUShort(withoutLargest.z, MIN_RANGE, MAX_RANGE, 0, NINE_BIT_MAX);
+            aScaled = withoutLargest.x.BindToUShort(MIN_RANGE, MAX_RANGE, 0, NINE_BIT_MAX);
+            bScaled = withoutLargest.y.BindToUShort(MIN_RANGE, MAX_RANGE, 0, NINE_BIT_MAX);
+            cScaled = withoutLargest.z.BindToUShort(MIN_RANGE, MAX_RANGE, 0, NINE_BIT_MAX);
         }
 
         public static Quaternion Decompress(byte index, ushort aScaled, ushort bScaled, ushort cScaled) {
-            float a = ScaleUShortToFloat(aScaled, 0, NINE_BIT_MAX, MIN_RANGE, MAX_RANGE);
-            float b = ScaleUShortToFloat(bScaled, 0, NINE_BIT_MAX, MIN_RANGE, MAX_RANGE);
-            float c = ScaleUShortToFloat(cScaled, 0, NINE_BIT_MAX, MIN_RANGE, MAX_RANGE);
+            float a = aScaled.UnbindToFloat(MIN_RANGE, MAX_RANGE, 0, NINE_BIT_MAX);
+            float b = bScaled.UnbindToFloat(MIN_RANGE, MAX_RANGE, 0, NINE_BIT_MAX);
+            float c = cScaled.UnbindToFloat(MIN_RANGE, MAX_RANGE, 0, NINE_BIT_MAX);
             float d = Mathf.Sqrt(1 - a*a - b*b - c*c);
 
             Quaternion value;
@@ -60,20 +62,6 @@ namespace Basically.Serialization {
             }
 
             return QuaternionNormalize(value);
-        }
-
-        private static ushort ScaleFloatToUShort(float value, float minValue, float maxValue, ushort minTarget, ushort maxTarget) {
-            int targetRange = maxTarget - minTarget;
-            float valueRange = maxValue - minValue;
-            float valueRelative = value - minValue;
-            return (ushort)(minTarget + (ushort)(valueRelative / valueRange * targetRange));
-        }
-
-        private static float ScaleUShortToFloat(ushort value, ushort minValue, ushort maxValue, float minTarget, float maxTarget) {
-            float targetRange = maxTarget - minTarget;
-            ushort valueRange = (ushort)(maxValue - minValue);
-            ushort valueRelative = (ushort)(value - minValue);
-            return minTarget + (valueRelative / (float)valueRange * targetRange);
         }
 
         private static Quaternion QuaternionNormalize(Quaternion value) {

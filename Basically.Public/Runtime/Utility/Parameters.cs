@@ -25,8 +25,8 @@ namespace Basically.Utility {
 
         public void Add<T>(string name, T value) where T : struct {
             if (full) throw new Exception("No more room in the parameter.");
-
-            if (keys.Length == index + 1) {
+            
+            if (keys.Length == index) {
                 Array.Resize(ref keys, keys.Length + 1);
                 Array.Resize(ref values, values.Length + 1);
             }

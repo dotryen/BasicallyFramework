@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Basically.Frameworks {
     using Networking;
+    using Utility;
 
     /// <summary>
     /// What Basically's runtime is based (get it) on.
@@ -12,12 +13,10 @@ namespace Basically.Frameworks {
         static Framework instance;
 
         internal uint tick;
-        internal bool ready;
+        internal bool running;
 
         public static Framework Instance => instance;
-        public Destination Destination { get; set; }
-        public uint Tick => tick;
-        public bool Ready => ready;
+        public bool Running => running;
 
         private void Awake() {
             if (instance != null) {
@@ -37,7 +36,7 @@ namespace Basically.Frameworks {
         }
 
         private void FixedUpdate() {
-            if (!ready) return;
+            if (!running) return;
 
             SimulatePrePhys();
 #if PHYS_3D
@@ -48,18 +47,19 @@ namespace Basically.Frameworks {
 #endif
             SimulatePostPhys();
             tick++;
+            AfterTickUpdate();
         }
 
         public void StartFramework() {
             InitializeUnitySettings();
             OnStart();
-            ready = true;
+            running = true;
         }
 
         public void StopFramework() {
-            if (!ready) return;
+            if (!running) return;
             OnStop();
-            ready = false;
+            running = false;
         }
 
         internal abstract void OnStart();
@@ -70,6 +70,11 @@ namespace Basically.Frameworks {
 
         internal abstract void SimulatePostPhys();
 
+        internal virtual void AfterTickUpdate() {
+            BGlobals.Tick = tick;
+            BGlobals.PredictedTick = tick;
+        }
+
         private void InitializeUnitySettings() {
 #if PHYS_3D
             Physics.autoSimulation = false;
@@ -77,8 +82,8 @@ namespace Basically.Frameworks {
 #if PHYS_2D
             Physics2D.autoSimulation = false;
 #endif
-            Time.fixedDeltaTime = NetworkTiming.TICK;
-            Time.maximumDeltaTime = NetworkTiming.TICK;
+            Time.fixedDeltaTime = BGlobals.TICK;
+            Time.maximumDeltaTime = BGlobals.TICK;
         }
     }
 

@@ -7,16 +7,12 @@ namespace Basically.Client {
     using Networking;
 
     public static class NetworkClient {
-        private static Transport host;
+        internal static Transport host;
         internal static HostCallbacks originalCallbacks;
         internal static MethodHandler handler;
+        internal static Connection connection;
 
-        public static Connection Connection {
-            get {
-                if (host == null) return null;
-                return host.Connections[0];
-            }
-        }
+        public static Connection Connection => connection;
 
         public static bool Connected {
             get {
@@ -25,23 +21,49 @@ namespace Basically.Client {
             }
         }
 
+        public static bool Authenticated {
+            get {
+                if (Connection == null) return false;
+                return Connection.Authenticated;
+            }
+        }
+
         public static MethodHandler Handler => handler;
 
         public static byte ID { get; internal set; }
+
+        public static bool Initialized { get; private set; }
 
         /// <summary>
         /// Initializes the Basically client.
         /// </summary>
         /// <param name="callbacks">Host callbacks to use, can be null.</param>
         public static void Initialize(HostCallbacks callbacks = null) {
-            if (host != null) return;
+            if (Initialized) return;
 
             handler = new MethodHandler(new ClientCallbacks());
             handler.AddReceiverClass(typeof(ClientReceivers));
             originalCallbacks = callbacks;
 
             host = new Transport(handler);
+            Initialized = true;
         }
+
+        #if BASICALLY_SERVER
+
+        internal static void LocalInitialize(HostCallbacks callbacks = null) {
+            if (Initialized) return;
+
+            handler = new MethodHandler(new ClientCallbacks());
+            handler.AddReceiverClass(typeof(ClientReceivers));
+            originalCallbacks = callbacks;
+
+            connection = new LocalServerConnection();
+
+            Initialized = true;
+        }
+
+        #endif
 
         /// <summary>
         /// Deinitializes the Basically client.
@@ -50,6 +72,8 @@ namespace Basically.Client {
         public static void Deinitialize() {
             host = null;
             originalCallbacks = null;
+            connection = null;
+            Initialized = false;
         }
 
         /// <summary>
@@ -60,6 +84,7 @@ namespace Basically.Client {
         public static void ConnectToServer(string ip, ushort port) {
             if (host == null) return;
             host.ConnectToHost(ip, port);
+            connection = host.Connections[0];
         }
 
         /// <summary>
@@ -67,7 +92,7 @@ namespace Basically.Client {
         /// </summary>
         public static void Update() {
             if (host == null) return;
-            ThreadData.ExecuteUnity();
+            handler.Tasks.Execute();
         }
 
         /// <summary>

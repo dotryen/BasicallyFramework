@@ -13,6 +13,8 @@ namespace Basically.Networking {
         public abstract string IP { get; }
         public abstract uint Ping { get; }
 
+        internal ThreadTasks threadToQueue;
+
         internal Connection() {
             Status = ConnectionStatus.WaitingForHandshake;
         }
@@ -27,7 +29,7 @@ namespace Basically.Networking {
         public void Send<T>(T message, byte channel, MessageType type) where T : struct, NetworkMessage {
             if (!Connected) return;
 
-            ThreadData.AddNet(() => {
+            threadToQueue.Add(() => {
                 var writer = Pool<Writer>.Pull();
                 Packer.Pack(message, writer);
                 SendInternal(writer.ToArray(), channel, type);

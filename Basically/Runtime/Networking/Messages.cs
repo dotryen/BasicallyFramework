@@ -15,13 +15,18 @@ namespace Basically.Networking {
         public bool success;
     }
 
+    internal struct TimeRequest : NetworkMessage {
+        public uint clientTime;
+        public uint serverTime;
+    }
+
     [DeltaEncoded]
     internal struct WorldSnapshot : NetworkMessage {
         public uint tick;
         public ushort[] ids;
         public EntityState[] states;
 
-        public float TickMS => tick * NetworkTiming.TICK;
+        public float TickMS => tick * BGlobals.TICK;
     }
 
     internal struct DeltaConfirm : NetworkMessage {

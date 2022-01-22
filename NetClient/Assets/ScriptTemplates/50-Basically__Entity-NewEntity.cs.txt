@@ -1,0 +1,63 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Basically.Entities;
+using Basically.Utility;
+
+public class #SCRIPTNAME# : Entity {
+    #region Client Callbacks
+    #if BASICALLY_CLIENT
+
+    protected override void OnClientStart() {
+
+    }
+
+    protected override void OnClientTick() {
+        
+    }
+
+    protected override void OnClientUpdate() {
+        
+    }
+
+    protected override void OnClientLateUpdate() {
+        
+    }
+
+    #endif
+    #endregion
+
+    #region Server Callbacks
+    #if BASICALLY_SERVER
+
+    protected override void OnServerStart() {
+        
+    }
+
+    protected override void OnServerTick() {
+        
+    }
+
+    #endif
+    #endregion
+
+    #region Entity Callbacks
+
+    protected override void Interpolate(EntityState from, EntityState to, float interpAmount) {
+        base.Interpolate(from, to, interpAmount);
+    }
+
+    #endregion
+
+    #region Serializing/Deseriazing
+
+    protected internal override void Serialize(ref IParameters parameters) {
+
+    }
+
+    protected internal override void Deserialize(IParameters parameters) {
+
+    }
+
+    #endregion
+}

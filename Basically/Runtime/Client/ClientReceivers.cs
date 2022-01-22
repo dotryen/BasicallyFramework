@@ -3,10 +3,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Basically.Networking;
 
 namespace Basically.Client {
     using Frameworks;
+    using Networking;
+    using Utility;
+    using Entities;
 
     [ReceiverClass]
     internal static class ClientReceivers {
@@ -31,12 +33,20 @@ namespace Basically.Client {
             }
         }
 
+        public static void TimeRequest(Connection conn, TimeRequest message) {
+            ClientFramework.Instance.tick = message.serverTime;
+            // ClientFramework.Instance.tick = (uint)(message.serverTime + Mathf.FloorToInt(conn.Ping / BTime.TICK));
+            ClientFramework.Instance.advance = true;
+            ClientFramework.Instance.AfterTickUpdate(); // force update
+        }
+
         public static void EntityUpdate(Connection conn, WorldSnapshot message) {
-            Interpolation.AddState(message);
+            EntityManager.AddSnapshot(message);
 
             if (!ClientFramework.Instance.advance) {
-                ClientFramework.Instance.tick = message.tick;
+                ClientFramework.Instance.tick = message.tick; // MUST BE CHANGED
                 ClientFramework.Instance.advance = true;
+                ClientFramework.Instance.AfterTickUpdate(); // force update
             }
         }
     }

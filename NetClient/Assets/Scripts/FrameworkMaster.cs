@@ -7,6 +7,7 @@ using Basically.Entities;
 using Basically.Networking;
 using Basically.Client;
 using Basically.Frameworks;
+using Basically.Utility;
 
 public class FrameworkMaster : MonoBehaviour {
     public float start = 0;
@@ -43,8 +44,9 @@ public class FrameworkMaster : MonoBehaviour {
                 start = Time.time;
             }
         } else {
+            GUILayout.Label($"Tick: {BGlobals.Tick}");
+            GUILayout.Label($"Predicted Tick: {BGlobals.PredictedTick}");
             GUILayout.Label($"Ping: {NetworkClient.Connection.Ping}");
-            Interpolation.InterpolationGUI();
 
             if (GUILayout.Button("Disconnect")) {
                 framework.StopFramework();
@@ -53,7 +55,7 @@ public class FrameworkMaster : MonoBehaviour {
     }
 
     private IEnumerator Load() {
-        var shell = Addressables.LoadAssetAsync<GameObject>("PlayerShell");
+        var shell = Addressables.LoadAssetAsync<GameObject>("PredPlayer");
         var game = Addressables.LoadAssetAsync<GameObject>("2DGame");
         if (!shell.IsDone || !game.IsDone) yield return null;
 

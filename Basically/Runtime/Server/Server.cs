@@ -7,6 +7,7 @@ using UnityEngine;
 namespace Basically.Server {
     using Entities;
     using Networking;
+    using Utility;
 
     public class Server : MonoBehaviour {
         public static Server Instance { get; private set; }
@@ -44,7 +45,7 @@ namespace Basically.Server {
         }
 
         public void StartServer(byte maxPlayers, ushort port) {
-            Time.fixedDeltaTime = NetworkTiming.TICK;
+            Time.fixedDeltaTime = BGlobals.TICK;
 #if PHYS_3D
             Physics.autoSimulation = false;
 #endif

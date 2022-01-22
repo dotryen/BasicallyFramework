@@ -7,15 +7,16 @@ using Basically.Server;
 using Basically.Networking;
 using Basically.Entities;
 using Basically.Frameworks;
+using Basically.Utility;
 
 public class FrameworkMaster : MonoBehaviour {
     GameObject player;
     GameObject game;
 
-    DedicatedServerFramework framework;
+    DedicatedFramework framework;
 
     private void Start() {
-        framework = GetComponent<DedicatedServerFramework>();
+        framework = GetComponent<DedicatedFramework>();
 
         SceneManager.sceneLoaded += (arg1, arg2) => {
             var type = FindObjectOfType<MapType>();
@@ -29,13 +30,14 @@ public class FrameworkMaster : MonoBehaviour {
             EntityManager.ServerStart();
 
             framework.StartFramework();
+            NetworkServer.Handler.AddReceiverClass(typeof(Receivers));
         };
 
         StartCoroutine(Load());
     }
 
     private IEnumerator Load() {
-        var player = Addressables.LoadAssetAsync<GameObject>("Player");
+        var player = Addressables.LoadAssetAsync<GameObject>("PredPlayer");
         var game = Addressables.LoadAssetAsync<GameObject>("2DGame");
         if (!player.IsDone || !game.IsDone) yield return null;
 
@@ -43,5 +45,10 @@ public class FrameworkMaster : MonoBehaviour {
         this.game = game.Result;
 
         SceneManager.LoadScene(1);
+    }
+
+    private void OnGUI() {
+        if (!framework.Running) return;
+        GUILayout.Label($"Tick: {BGlobals.Tick}");
     }
 }

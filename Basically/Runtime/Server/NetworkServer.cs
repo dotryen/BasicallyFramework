@@ -11,18 +11,14 @@ namespace Basically.Server {
     using Utility;
 
     public static class NetworkServer {
-        private static Transport host;
+        internal static Transport host;
         internal static HostCallbacks originalCallbacks;
         internal static MethodHandler handler;
 
         public static MethodHandler Handler => handler;
         public static Connection[] Connections => host.Connections;
-        public static byte ConnectedPlayers {
-            get {
-                if (host != null) return (byte)Connections.Where(x => x != null).Count();
-                return 0;
-            }
-        }
+        public static byte ConnectedPlayers => host.ConnectionCount;
+        public static bool Initialized { get; private set; }
 
         /// <summary>
         /// Initializes the Basically server.
@@ -36,6 +32,8 @@ namespace Basically.Server {
             originalCallbacks = callbacks;
 
             host = new Transport(handler);
+
+            Initialized = true;
         }
 
         /// <summary>
@@ -43,6 +41,7 @@ namespace Basically.Server {
         /// </summary>
         public static void Deinitialize() {
             host = null;
+            Initialized = false;
         }
 
         /// <summary>
@@ -68,7 +67,7 @@ namespace Basically.Server {
         /// </summary>
         public static void Update() {
             if (host == null) return;
-            ThreadData.ExecuteUnity();
+            handler.Tasks.Execute();
         }
 
         /// <summary>
